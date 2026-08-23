@@ -110,6 +110,11 @@
       }
     ]
   },
+  "integrations": {
+    "ga4": {
+        "measurementId": "G-SCPVJ9QFG6"
+    }
+  },
   "navbar": {
     "links": [
       {
