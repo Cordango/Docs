@@ -57,18 +57,19 @@ migration is still a migration, and it still runs against real data.
 
 ## Choosing how the runtime arrives
 
-<ParamField path="default" type="source">
-  `Cordango.Standalone` is emitted as source into the project. Nothing to restore, no feed to
-  depend on. This is what makes the output independent.
+<ParamField path="default" type="NuGet reference">
+  `Cordango.Standalone` is restored from NuGet, pinned to the version of the generator that wrote the
+  project file. The repository then holds your application and nothing else.
 </ParamField>
 
-<ParamField path="--runtime package" type="NuGet reference">
-  References `Cordango.Standalone` from a feed instead, pinned to the generator's version. A smaller
-  repository, at the cost of a dependency.
+<ParamField path="--runtime source" type="source">
+  Emits `Cordango.Standalone` as a `runtime/` project beside `api/` instead. Nothing to restore and
+  no feed to depend on, at the cost of twenty files of ours in front of yours.
 </ParamField>
 
-Pick source unless you have a reason. The whole argument for the standalone target is that what you
-generate outlives its generator.
+Take the default unless you have a reason. Either way the runtime is Apache-2.0 and its source is
+public, so what you generate outlives its generator: `--runtime source` is a switch you can throw
+later, not a decision you are locked out of.
 
 ## Seed data
 

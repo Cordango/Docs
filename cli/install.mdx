@@ -38,6 +38,7 @@ so these numbers matter when you come back to a project later.
   directory and the error wire.
 </ResponseField>
 
-You don't install this one. A generated application emits it as source, so what comes out of
-`cordango build` has no dependency on a feed. `--runtime package` references it from NuGet instead,
-pinned to the version of the generator that wrote the project file.
+You don't install this one. A generated application references it, pinned to the version of the
+generator that wrote the project file, and `dotnet build` restores it like any other package.
+`--runtime source` emits it into the project instead, which leaves the output with no feed to depend
+on.

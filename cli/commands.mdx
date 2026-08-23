@@ -63,9 +63,10 @@ cordango build --app support --target dotnet-vue --out ./out
   behaviour refuses the build.
 </ParamField>
 
-<ParamField path="--runtime package" type="flag">
-  Reference `Cordango.Standalone` from a feed instead of checking its source into the generated
-  project. The default emits the runtime as source, so what you generate has no dependency on us.
+<ParamField path="--runtime source" type="flag">
+  Check the `Cordango.Standalone` source into the generated project, as a `runtime/` project beside
+  `api/`, instead of restoring the package. Use it to work on the runtime itself, or to build against
+  a version no feed has yet.
 </ParamField>
 
 ## check

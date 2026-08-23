@@ -69,12 +69,15 @@ still building, wrong flag for a release.
 
 ## The generated project is yours
 
-The output has no runtime dependency on Cordango. No license server, no account, no model API. It's
-an ordinary ASP.NET Core and Vue project, and it keeps working whether or not this project does.
+The output depends on no service of ours. No license server, no account, no model API. It's an
+ordinary ASP.NET Core and Vue project, and it keeps working whether or not this project does.
 
-<ParamField path="--runtime package" type="flag">
-  Reference `Cordango.Standalone` from NuGet instead of emitting it as source. The default emits
-  source, which is what makes the output independent.
+It has one library dependency on us, `Cordango.Standalone`, restored from NuGet like any other
+package. That one is Apache-2.0 and its source is public, so it can be read, forked or replaced, and
+`--runtime source` removes even the dependency.
+
+<ParamField path="--runtime source" type="flag">
+  Emit `Cordango.Standalone` as source into the project instead of referencing the package.
 </ParamField>
 
 <ParamField path="--seed" type="number">
