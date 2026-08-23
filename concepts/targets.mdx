@@ -14,6 +14,10 @@ cordango targets
 
 `dotnet-vue` is the first-party one: ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify.
 
+What it produces serves three faces from one process — the application, a REST API documented at
+`/scalar` from a real OpenAPI 3.1 document at `/openapi/v1.json`, and an [MCP endpoint](/mcp/overview)
+at `/mcp` — all three going through the same permissions.
+
 ## Every target declares both halves
 
 A target reports what it supports and, separately, what it deliberately withholds. Those are not

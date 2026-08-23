@@ -7,11 +7,11 @@ import PlatformBeta from "/snippets/platform-beta.mdx";
 
 <PlatformBeta />
 
-<Warning>
-**Not built yet.** There is no Cordango MCP server to connect to. This page records the intended
-design so the shape is not invented twice. Nothing here is a stable contract, and no tool names on
-this page should be relied on.
-</Warning>
+<Note>
+**Standalone apps have this today.** Every app built with `cordango build --target standalone` serves
+an MCP endpoint at `/mcp`, on by default. The hosted platform's own MCP facade is still being built —
+the open questions at the bottom of this page are about that one.
+</Note>
 
 ## The intent
 
@@ -33,7 +33,82 @@ The point of the split is that MCP is not a separate integration with its own pe
 projects the operations that already exist, through the same checks the REST facade goes through,
 so an AI client acting as you can reach exactly what you can reach.
 
-## What exists today
+## In a standalone app
+
+A generated app serves all three faces from one process:
+
+| | |
+|---|---|
+| `/` | the application |
+| `/scalar` | its API, documented and callable in a browser |
+| `/openapi/v1.json` | the OpenAPI 3.1 document behind that page |
+| `/mcp` | the MCP endpoint |
+
+### The tools
+
+Eight, whatever the app contains:
+
+| Tool | What it does |
+|---|---|
+| `describe_app` | Every entity, its fields as JSON Schema, its commands, and what **you** may do with each |
+| `list_records` | A page of records, with filters and sorting |
+| `get_record` | One record by id |
+| `create_record` | Add one |
+| `update_record` | Change the fields you name, leaving the rest alone |
+| `delete_record` | Remove one |
+| `run_command` | Run one of the app's own actions — approve, close, assign |
+| `aggregate_records` | Count or total, computed by the database |
+
+Deliberately not one tool set per entity. A client pays for the tool list on every request, so an app
+with twenty entities would otherwise publish eighty tools and charge for that list every time. Here
+the cost is constant and `describe_app` is how a client learns the fields. The entity parameter
+carries an `enum` of the app's real entity keys, so a client can make its first call without a
+round trip.
+
+### Permissions
+
+Nothing is reachable over MCP that is not reachable over REST. Every tool goes through the same
+gateway the controllers do, so the app's roles decide each call, fields your role may not read are
+absent from the answer rather than null, and a refusal carries the same stable code — for example
+`record.create_denied` — that the REST route returns.
+
+`describe_app` reports your own permissions per entity, so a client can plan rather than discover its
+limits by being refused halfway through a task.
+
+### Connecting
+
+An MCP client is not a browser: it has no session cookie. Mint an **access key** under *Access keys*
+in the app's navigation and send it as a bearer token.
+
+```
+POST /mcp
+Authorization: Bearer cordango_pat.a1b2c3d4.…
+MCP-Protocol-Version: 2026-07-28
+Mcp-Method: tools/list
+Accept: application/json, text/event-stream
+```
+
+A key acts as the person who created it — same roles, same audit trail — expires if they gave it a
+date, and stops working the moment their account is locked. Only a hash of it is stored, so it is
+shown once and cannot be recovered; mint a new one instead.
+
+The transport is Streamable HTTP at protocol revision `2026-07-28`, which is stateless: there is no
+`initialize` handshake and no session, so the endpoint works unchanged behind a load balancer or
+scaled to several containers.
+
+<Note>
+Discovery is provisional. The app also serves a server card at `/.well-known/mcp/server-card.json`,
+which is the path [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
+proposes — an open proposal rather than part of the specification. Expect it to move, and do not
+build anything that depends on finding it there.
+</Note>
+
+### Turning it off
+
+Delete the `AddCordangoMcp` and `MapCordangoMcp` lines from `api/Program.cs`. The REST facade and the
+OpenAPI document are unaffected.
+
+## On the hosted platform
 
 The REST facade is real and documented. It is generated from the app's manifest, and each app
 publishes its own OpenAPI document:
@@ -42,18 +117,13 @@ publishes its own OpenAPI document:
 GET /api/app/{handle}/openapi.json
 ```
 
-Until there is an MCP server, that document is the practical route for an AI client: point a tool
-generator at it and you get the app's real entities and fields rather than a generic shape.
+Until the platform's MCP facade lands, that document is the practical route for an AI client: point a
+tool generator at it and you get the app's real entities and fields rather than a generic shape.
 
 ## Open questions
 
-These are undecided rather than merely undocumented:
+These are about the **hosted platform** and are undecided rather than merely undocumented:
 
-- Transport specifics, streamable HTTP and resumability.
 - Whether a per-app server, a workspace-level aggregator gateway, or both.
-- Tier gating. MCP is planned as a paid-tier feature.
-
-<Note>
-When the server lands, this section gets a real tool reference. Until then, treat anything claiming
-to document Cordango MCP tools as fiction.
-</Note>
+- Tier gating. Platform MCP is planned as a paid-tier feature. A standalone app's own MCP endpoint is
+  part of the open-source runtime and is not gated.
