@@ -22,8 +22,8 @@ the setup there is.
 
 ## An always-on rule
 
-`AGENTS.md` covers the workflow. Where Cursor adds something is a rule that is guaranteed to be in
-context on every request, and one that attaches itself when a `.cordango.yaml` file is open.
+`AGENTS.md` covers the workflow. What Cursor adds on top is a rule guaranteed to be in context on
+every request, plus one that attaches itself whenever a `.cordango.yaml` file is open.
 
 Project rules live in `.cursor/rules` and **must** use the `.mdc` extension. A plain `.md` file in
 that directory is ignored.
@@ -38,7 +38,7 @@ This is a Cordango workspace. Apps under `apps/` are defined by semantic source:
 files describing entities, workflows, roles and screens.
 
 - Run `cordango inspect` before changing anything. Never read the App Definition schema and never
-  read the cordango binary; `cordango vocabulary` is the authority on what may be written.
+  read the cordango binary. `cordango vocabulary` is the authority on what may be written.
 - `cordango check` calls no model and touches no database. Run it after every change.
 - Never edit `.cordango/` (the dotted directory). It is build output.
 - Use stable keys. Renaming an entity or field key is not supported.
@@ -85,9 +85,9 @@ Then work one aggregate at a time, running cordango check between each.
 
 ## Keep the editor out of the generated app
 
-If you generate an application into the workspace, exclude it from indexing. It is a large tree of
-ordinary ASP.NET Core and Vue code with nothing in it Cursor needs to reason about while you are
-authoring, and it will crowd out the source files that matter.
+If you generate an application into the workspace, exclude it from indexing. It's a large tree of
+ordinary ASP.NET Core and Vue code, none of which Cursor needs to reason about while you're
+authoring, and it'll crowd out the source files that matter.
 
 ```text
 # .cursorignore

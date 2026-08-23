@@ -4,7 +4,7 @@ description: "Starting prompt and setup for Codex."
 ---
 
 Codex reads `AGENTS.md` from the project, and `cordango new` writes one with the same content as
-`CLAUDE.md`. There is nothing to configure.
+`CLAUDE.md`. There's nothing to configure.
 
 <Steps>
   <Step title="Create the workspace">
@@ -24,7 +24,7 @@ Codex reads `AGENTS.md` from the project, and `cordango new` writes one with the
 
 A Cordango workspace is a good fit for `workspace-write`. The whole authoring loop writes only
 inside the workspace, and the parts that reach the network are the four connected commands, which
-you will want to approve anyway.
+you'll want to approve anyway.
 
 ```toml
 # .codex/config.toml
@@ -74,12 +74,12 @@ codex exec "Run cordango check --json and summarise any errors by file. Do not c
 ```
 
 Keep an exec prompt read-only unless you have a reason not to. An agent editing files with nobody
-watching is a fine way to discover that the aggregate you scoped it to was the wrong one.
+watching is a fine way to find out that the aggregate you scoped it to was the wrong one.
 
 ## Nested instructions
 
-Codex reads `AGENTS.md` from subdirectories as well as the root. That is useful in a workspace with
+Codex reads `AGENTS.md` from subdirectories as well as the root. That's useful in a workspace with
 several apps: a per-app `apps/support/AGENTS.md` can carry the business rules that only apply to
 that app, while the generated root file keeps carrying the Cordango workflow.
 
-Do not restate the workflow in a nested file. Add to it.
+Don't restate the workflow in a nested file. Add to it.

@@ -6,8 +6,11 @@ description: "How the pieces fit together."
 import PlatformBeta from "/snippets/platform-beta-inline.mdx";
 
 
-Cordango has one idea in the middle of it: an application is a **document**, not a codebase. You
-describe what the application is, and something else works out what it has to be to run.
+One idea sits in the middle of Cordango: an application is a **document** rather than a codebase.
+You describe what the application is, and something else works out what it has to be to run.
+
+That document is the portable part. The platform runs it, and the standalone generator compiles it
+into conventional source code, both from the same file.
 
 ```
 Human or AI
@@ -27,8 +30,8 @@ Cordango Platform     Standalone generator
                       deploy anywhere
 ```
 
-Everything above the App Definition is open source and runs offline. `cordango check` needs no
-model, no database, no account and no network.
+Everything above the App Definition is the open foundation. It's Apache-2.0 and it runs offline:
+`cordango check` needs no model, no database, no account and no network.
 
 <PlatformBeta />
 
@@ -52,8 +55,8 @@ model, no database, no account and no network.
 
 ## Workspaces and apps
 
-A workspace holds many apps. That is deliberate: a company system is several applications that
-reference each other, not one application with everything in it.
+A workspace holds many apps, and that's on purpose. A company system is usually several
+applications that reference each other rather than one application with everything crammed into it.
 
 <CodeGroup>
 ```bash Create the workspace
@@ -72,8 +75,8 @@ Apps in one workspace can reference each other's records, and they can reference
 ## Aggregates and scope
 
 An **aggregate** is one addressable thing: an entity, a lifecycle, an action, an automation, a role,
-a screen. It is the unit a file holds, the unit a change is scoped to, and the unit `cordango
-inspect` describes.
+a screen. It's the unit a file holds, and the same unit that `--scope` and `cordango inspect` work
+on.
 
 ```bash
 cordango inspect                                # the workspace
@@ -87,15 +90,15 @@ the one aggregate a change may touch.
 
 ## Coherent, complete, valid
 
-Three different words that get used interchangeably elsewhere and mean distinct things here.
+Three words that get used interchangeably elsewhere. Here they mean different things.
 
 <ResponseField name="not coherent" type="error">
-  The app does not hold together. A reference points at nothing, a lifecycle names a state that
-  does not exist. Fix it.
+  The app doesn't hold together. A reference points at nothing, a lifecycle names a state that
+  doesn't exist. Fix it.
 </ResponseField>
 
 <ResponseField name="coherent, incomplete" type="normal">
-  It holds together but is not a finished application: no screen to land on, nothing to create.
+  It holds together but isn't a finished application yet: no screen to land on, nothing to create.
   This is the usual state mid-build. It publishes, with reasons printed.
 </ResponseField>
 

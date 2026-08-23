@@ -12,8 +12,8 @@ Everything in the authoring loop. `new`, `add app`, `import`, `check`, `validate
 `build`, `inspect`, `vocabulary`, `apply`, `fmt`, `doctor` and `version` make no network call,
 contact no model, and need no account.
 
-That is not a side effect. `cordango check` has to work from a clone of the open source repository
-with nothing above it, and the test that proves it is a test.
+That isn't an accident. `cordango check` has to work from a clone of the open source repository with
+nothing above it, and there's a test in the suite that proves it.
 
 <PlatformBeta />
 
@@ -32,8 +32,8 @@ for exactly this reason.
 </ResponseField>
 
 <ResponseField name="publish" type="sends your app">
-  Builds from source and sends the resulting App Definition to the instance. Your definition. Not
-  your source files, and not your git history.
+  Builds from source and sends the resulting App Definition to the instance. Your definition, not
+  your source files and not your git history.
 </ResponseField>
 
 <ResponseField name="logout" type="local only">
@@ -50,12 +50,12 @@ cord_cxt.<keyId>.<secret>.<encodedAddress>
 ```
 
 The prefix is there so a leaked credential is recognisable to a secret scanner on sight. The key id
-is separate from the secret so a key can be named in a log or an audit entry without that log
-holding anything usable.
+sits apart from the secret so a key can be named in a log or an audit entry without that log holding
+anything usable.
 
 **An exchange token's embedded address is a claim, not authority.** It says which instance and
 tenant it belongs to. `cordango login` connects to the named instance, asks the server which tenant
-it actually belongs to, and refuses when the two disagree. A pasted credential does not get to tell
+it actually belongs to, and refuses when the two disagree. A pasted credential doesn't get to tell
 the CLI where to send itself.
 
 <Warning>
@@ -64,41 +64,41 @@ that has leaked keeps working until you delete it on the instance, under the sam
 Keys screen that minted it.
 </Warning>
 
-Pass a token as `--token` rather than positionally if you would rather it stayed out of your shell
+Pass a token as `--token` rather than positionally if you'd rather it stayed out of your shell
 history. Both spellings work.
 
 ## What a key can do
 
 A key acts as you. It carries your relationships and the roles those grant, so it reaches exactly
-what you reach and nothing more. There is no key that is broader than its owner.
+what you reach and nothing more. No key is broader than its owner.
 
 ## AI
 
-There is no AI in the open source product. The compiler, the CLI and the generator call no model,
-and a generated application contains no AI at runtime.
+There's no AI anywhere in the open foundation. The compiler, the CLI and the generator call no
+model, and a generated application contains no AI at runtime.
 
 AI is a Cordango Platform feature. It runs on the instance, on your workspace's data, under that
 instance's terms.
 
-An AI coding agent you point at your workspace yourself is a separate matter, and the ordinary one:
+An AI coding agent you point at your own workspace is a separate matter, and the ordinary one:
 whatever you give it goes wherever that vendor sends it. Your semantic source is the description of
 your business. Treat sharing it with an agent as the disclosure it is, and check your agent's data
 retention terms rather than ours.
 
 ## The generated application
 
-What comes out of `cordango build` is yours, and its security is yours.
+What comes out of `cordango build` is yours, and so is its security.
 
 The scaffold arrives with the parts that are easy to get wrong already right: the first-run account
 endpoint that closes permanently, data protection keys on a volume rather than in the container,
 antiforgery wired up, and cookies configured to survive a plain-HTTP local run without shipping that
 setting to production.
 
-Everything after that is an ordinary ASP.NET Core deployment. Nothing in it phones home, and
-nothing in it needs us to keep existing.
+Everything after that is an ordinary ASP.NET Core deployment. Nothing in it phones home, and nothing
+in it needs us to keep existing.
 
 ## Reporting something
 
 Security issues in the compiler, CLI or generator belong at
-[github.com/cordango/cordango](https://github.com/cordango/cordango). Please report privately
-rather than in a public issue.
+[github.com/cordango/cordango](https://github.com/cordango/cordango). Please report privately rather
+than in a public issue.

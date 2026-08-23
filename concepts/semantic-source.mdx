@@ -6,9 +6,9 @@ description: "The .cordango.yaml files you actually write."
 Semantic source is what you author. One aggregate per file, one file per thing: an entity, a
 lifecycle, an action, an automation, a role, a screen.
 
-The point is not that YAML is nicer than JSON. It is that **one thing lives in one file**. An
-entity you can open, read in full and review in a diff is a different object from the same entity
-buried three thousand lines into a single document.
+YAML being nicer to read than JSON isn't really the reason for it. The reason is that **one thing
+lives in one file**. An entity you can open, read top to bottom and review in a diff is a very
+different object from the same entity buried three thousand lines into a single document.
 
 ## The shape of a file
 
@@ -37,7 +37,7 @@ screen: costs
 ```
 </CodeGroup>
 
-That first line is how the compiler knows what it is reading. The directory is for humans.
+That first line is how the compiler knows what it's reading. The directory layout is for you.
 
 ## An entity
 
@@ -76,8 +76,8 @@ fields:
     label: Description
 ```
 
-`fields` is a **map keyed by field key**. The key is the identifier the rest of the app refers to;
-everything under it describes what that field is.
+`fields` is a **map keyed by field key**. The key is the identifier the rest of the app refers to,
+and everything under it describes what that field is.
 
 <Note>
 `kind` says what sort of thing the entity is: `collection` for records people create all day,
@@ -90,15 +90,15 @@ the app presents the entity, not how it stores it.
 `text`, `longtext`, `integer`, `decimal`, `money`, `boolean`, `date`, `datetime`, `email`, `url`,
 `phone`, `select`, `multiselect`, `reference`, `json`, `attachment`.
 
-A field says what it *is*. Type-specific keys follow from that: `options` on a `select`, `currency`
-on `money`, `precision` and `scale` on `decimal`, `targetEntity` on a `reference`.
+A field says what it *is*, and the type-specific keys follow from that: `options` on a `select`,
+`currency` on `money`, `precision` and `scale` on `decimal`, `targetEntity` on a `reference`.
 
 ```bash
 cordango vocabulary field
 ```
 
 That prints every property a field accepts and every type it can be, from the build you have
-installed. It is the authoritative answer, and it is shorter than this page.
+installed. It's the authoritative answer, and it's shorter than this page.
 
 ## A role
 
@@ -117,9 +117,9 @@ grants:
     read: true
 ```
 
-There is no inheritance and no wildcard. An entity you did not name is an entity this role cannot
-touch, which means reading the file tells you what the role can do without having to hold the rest
-of the app in your head.
+No inheritance, no wildcards. If you didn't name an entity, this role can't touch it. That's what
+lets you read one file and know what the role can do without holding the rest of the app in your
+head.
 
 ## A lifecycle
 
@@ -174,7 +174,7 @@ effects:
 
 ## The app file
 
-One per app, holding what is not owned by any single aggregate: identity, theme, relations between
+One per app, holding everything no single aggregate owns: identity, theme, relations between
 entities, and the order things appear in.
 
 ```yaml
@@ -198,7 +198,7 @@ relations:
 
 ## Two halves of a workspace
 
-This is worth knowing, because it changes how much vocabulary you need.
+Worth knowing, because it changes how much vocabulary you need.
 
 <CardGroup cols={2}>
   <Card title="Semantic" icon="circle-check">
@@ -211,7 +211,7 @@ This is worth knowing, because it changes how much vocabulary you need.
   </Card>
 </CardGroup>
 
-Ask for one block kind at a time. Asking for everything defeats the point of the layer.
+Ask for one block kind at a time. Asking for all of them defeats the point of the layer.
 
 ## Formatting
 
@@ -220,9 +220,9 @@ cordango fmt
 ```
 
 Rewrites every `.cordango.yaml` file in canonical form: consistent key order, consistent quoting.
-Run it after hand-editing so a diff shows a change in meaning rather than a change in whitespace.
+Run it after hand-editing, so a diff shows a change in meaning instead of a change in whitespace.
 
-## What is not source
+## What isn't source
 
-`.cordango/`, with the leading dot, is build output. It is regenerated and it is not committed.
-Editing it does nothing that survives the next `cordango build`.
+`.cordango/`, with the leading dot, is build output. It gets regenerated and it doesn't belong in
+git. Anything you edit in there disappears on the next `cordango build`.

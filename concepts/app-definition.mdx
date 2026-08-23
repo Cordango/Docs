@@ -3,16 +3,16 @@ title: The App Definition
 description: "The JSON document your source compiles into."
 ---
 
-The App Definition is one JSON document that fully describes an application. It is the contract
-everything downstream consumes: the runtime, the UI renderer, the standalone generator and the
+The App Definition is one JSON document that fully describes an application. It's the contract
+everything downstream consumes. The runtime, the UI renderer, the standalone generator and the
 publish pipeline all read this and nothing else.
 
-You do not write it. You write [semantic source](/concepts/semantic-source), and the compiler
+You don't write it. You write [semantic source](/concepts/semantic-source), and the compiler
 produces this.
 
 ## Why there are two formats
 
-They are not competing spellings of the same thing. They answer to different readers.
+Because they answer to different readers.
 
 | | Semantic source | App Definition |
 | --- | --- | --- |
@@ -23,11 +23,11 @@ They are not competing spellings of the same thing. They answer to different rea
 | Read by | People, in diffs | Machines |
 | In git | Yes | No, it is build output |
 
-A real app makes the difference concrete. The Budget Planner corpus app is 98 source files totalling
-about 133 KB, and it compiles to a single 225 KB JSON document.
+A real app makes that concrete. The Budget Planner corpus app is 98 source files totalling about
+133 KB, and it compiles to a single 225 KB JSON document.
 
-The size is not the point. Ninety-eight files that each describe one thing can be reviewed one at a
-time; one 225 KB document cannot.
+Size isn't the interesting part. Ninety-eight files that each describe one thing can be reviewed one
+at a time. A 225 KB document can't be.
 
 ## The same entity, both ways
 
@@ -59,13 +59,13 @@ fields:
 </CodeGroup>
 
 In source, `fields` is a map and the field key is the map key. In the App Definition, `fields` is an
-array and every item carries its own `key`. Maps read better and cannot contain a duplicate key;
-arrays preserve order and are what a schema validator and a code generator want.
+array and every item carries its own `key`. Maps read better and can't hold a duplicate key. Arrays
+preserve order, which is what a schema validator and a code generator want.
 
 ## The envelope
 
 Five things are required at the top level: `schemaVersion`, `key`, `name`, `version` and
-`entities`. An app with no entities is not an app.
+`entities`. An app with no entities isn't an app.
 
 ```json
 {
@@ -99,12 +99,12 @@ Everything else is optional, and each optional block is a concern the app may or
   What kind of application this is, and what it is for.
 </ResponseField>
 
-## Where you will meet it
+## Where you'll meet it
 
-Mostly you will not. Three places you might:
+Mostly you won't. Three places you might:
 
-**`cordango build`** writes it under `.cordango/build/<key>/`. Deterministic: the same source
-produces the same bytes.
+**`cordango build`** writes it under `.cordango/build/<key>/`. It's deterministic, so the same
+source produces the same bytes.
 
 **`cordango import`** goes the other way. Hand it an existing App Definition and it produces source
 files you can edit.
@@ -114,11 +114,11 @@ cordango import ./app.definition.json --app support
 ```
 
 **`cordango publish`** sends one to an instance. It builds from source rather than from
-`.cordango/`, because a build artifact is a cache and a cache is not an authority.
+`.cordango/`, because a build artifact is a cache, and a cache isn't an authority.
 
 <Warning>
-`.cordango/` is build output. Editing the compiled App Definition there is not a way to change your
-app; the next build overwrites it. Change the source.
+`.cordango/` is build output. Editing the compiled App Definition in there won't change your app,
+because the next build overwrites it. Change the source.
 </Warning>
 
 ## Comparing definitions

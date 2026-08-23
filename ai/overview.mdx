@@ -3,12 +3,12 @@ title: Building with an agent
 description: "Cordango is designed to be driven by an AI coding agent."
 ---
 
-An App Definition is a document with a published schema and an offline checker. That makes it an
-unusually good target for an AI agent: it can write, check its own work, and be told precisely what
-it got wrong, all without a database, a model API or a deploy.
+An App Definition is a document with a published schema and an offline checker. That's a good deal
+for an AI agent. It can write something, check its own work, and be told exactly what it got wrong,
+with no database, no model API and no deploy anywhere in the loop.
 
-This section has a tuned starting prompt for each of the common agents. They differ, because the
-tools differ. Read this page first, because the reasoning behind all of them is the same.
+This section has a starting prompt for each of the common agents. The prompts differ because the
+tools differ, but the reasoning behind all of them is the same, so read this page first.
 
 ## Your workspace already briefs the agent
 
@@ -16,39 +16,38 @@ tools differ. Read this page first, because the reasoning behind all of them is 
 cordango new support
 ```
 
-That writes `CLAUDE.md` and `AGENTS.md` into the workspace root, with the same generated text in
-both. Two conventions want two filenames, and a workspace that taught two agents different rules
-would produce source only one of them could maintain.
+That writes `CLAUDE.md` and `AGENTS.md` into the workspace root, same generated text in both. Two
+conventions, two filenames. Both get written because a workspace that taught two agents different
+rules would end up with source only one of them could maintain.
 
 <Note>
-This is the single most important thing on the page. The instructions are already there. Your
-prompt does not need to re-explain Cordango, and it should not try.
+This is the most important thing on the page. The instructions are already there. Your prompt
+doesn't need to re-explain Cordango, and it shouldn't try.
 </Note>
 
-What those files teach is the **workflow**, not the vocabulary: how to find out, rather than a copy
-of the schema. That is deliberate, and it is what stops an agent's context filling up with 212 KB of
-JSON Schema.
+What those files teach is the workflow: how to find things out. They deliberately don't paste the
+vocabulary in. That's what keeps an agent's context from filling up with 212 KB of JSON Schema.
 
 ## The rules they install
 
-Every prompt in this section leans on these, so they are worth reading once.
+Every prompt in this section leans on these, so they're worth reading once.
 
-**Discover, do not guess.** `cordango inspect` for what exists, `cordango vocabulary` for what may
-be written. Both answer from the installed build, so they cannot drift from what the CLI will
+**Discover, don't guess.** `cordango inspect` for what exists, `cordango vocabulary` for what you're
+allowed to write. Both answer from the installed build, so they can't drift from what the CLI will
 accept.
 
-**Never read the schema, never read the binary.** If `cordango vocabulary` cannot answer a
-question, that is a gap worth reporting rather than working around.
+**Never read the schema, never read the binary.** If `cordango vocabulary` can't answer a question,
+we'd rather hear about the gap than have an agent work around it.
 
-**Check constantly.** `cordango check` calls no model and touches no database. It is free. Run it
+**Check constantly.** `cordango check` calls no model and touches no database. It's free. Run it
 after every change.
 
-**One aggregate per change.** It keeps diffs reviewable, and it is what `--scope` enforces.
+**One aggregate per change.** Diffs stay reviewable, and it's what `--scope` enforces anyway.
 
-**Stable keys.** Renaming an entity or field key is not supported, because nothing rewrites the
-references to it. Add and remove deliberately instead.
+**Stable keys.** You can't rename an entity or field key, because nothing rewrites the references to
+it. Add and remove deliberately instead.
 
-**The agent does not accept its own work.** `cordango apply` writes to the working tree. A person
+**The agent doesn't accept its own work.** `cordango apply` writes to the working tree. A person
 reads `git diff` and stages it.
 
 ## Every command speaks JSON
@@ -59,8 +58,8 @@ cordango inspect --app support --json
 cordango check --json
 ```
 
-`--json` works on all of them. `cordango help --json` in particular is how an agent discovers the
-command surface without a human pasting a README into its context.
+`--json` works on all of them. `cordango help --json` is how an agent discovers the command surface
+without a human pasting a README into its context.
 
 ## The shape of a good prompt
 
@@ -73,9 +72,9 @@ defaulting to normal. Then show it as a column on the tickets table.
 Run cordango check when you are done. Do not commit.
 ```
 
-Note what is absent. No explanation of what Cordango is, no YAML example, no schema excerpt, no list
-of field types. All of that is one `cordango vocabulary field` away, and an agent that looks it up
-gets the version that matches the installed CLI.
+Look at what's missing. No explanation of what Cordango is, no YAML example, no schema excerpt, no
+list of field types. All of that is one `cordango vocabulary field` away, and an agent that looks it
+up gets the version matching the CLI it's actually running.
 
 ## Pick your agent
 

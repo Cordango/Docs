@@ -6,33 +6,38 @@ description: "Build complete business applications from a definition you own."
 import PlatformBeta from "/snippets/platform-beta-inline.mdx";
 
 
-Cordango is an open application language and a deterministic compiler. You describe what an
-application should do, and Cordango turns that description into a working application.
+Cordango is an application platform. You describe a complete business application, and Cordango
+turns that description into something that runs.
 
-The description is the artefact that matters. It is called an **App Definition**, and it is the
-same file whether you run the application on the Cordango Platform or generate a standalone
-project and host it yourself.
+Under the platform sits an open foundation: a portable app format, a deterministic compiler and a
+CLI, all Apache-2.0. That's the part that turns a description into a real application, and it's why
+the same description has two destinations. Run it on Cordango, or generate conventional source code
+you own and deploy anywhere.
+
+The description is the part you keep. It's called an **App Definition**, and it's the same file
+either way.
 
 <Note>
-Cordango is pre-alpha. The language, the CLI and the generated output all still change between
+Cordango is pre-alpha. The app format, the CLI and the generated output all still change between
 releases.
 </Note>
 
-## The two products
+## The platform, and the foundation under it
 
 <CardGroup cols={2}>
-  <Card title="Cordango Open Source" icon="box" href="/cli/install">
-    Builds one application. Its own backend, frontend, database, users, authentication and
-    permissions. Not multi-tenant, no AI at runtime, and no dependency on us once it is generated.
-  </Card>
   <Card title="Cordango Platform" icon="building" href="/api-reference/introduction">
-    Connects and governs many applications as one company system: shared people and organizations,
-    cross-app references, audit history, AI, search and managed hosting.
+    The hosted product. Many applications running as one company system: shared people and
+    organizations, cross-app references, audit history, AI, search and managed hosting.
+  </Card>
+  <Card title="The open foundation" icon="box" href="/cli/install">
+    The app format, the compiler, the CLI and the standalone generator, Apache-2.0. Builds one
+    application with its own backend, frontend, database, users, authentication and permissions.
+    Not multi-tenant, no AI at runtime, and no dependency on us once it's generated.
   </Card>
 </CardGroup>
 
-The same App Definition works in both places. What differs is what each target supports, and every
-target says so out loud rather than quietly dropping what it cannot do.
+The same App Definition works in both places. What each destination supports differs, and one that
+can't do something says so out loud instead of quietly dropping it.
 
 <PlatformBeta />
 

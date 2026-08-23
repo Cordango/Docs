@@ -42,12 +42,12 @@ cord_cxt.<keyId>.<secret>.<encodedAddress>
 </CodeGroup>
 
 The prefix exists so a leaked credential is recognisable to a secret scanner on sight. The key id
-is separate from the secret so a key can be identified in a log or an audit entry without the log
+sits apart from the secret so a key can be identified in a log or an audit entry without that log
 holding anything usable.
 
-An exchange token additionally encodes the instance address and tenant. That is a convenience for
-`cordango login`, not an authority: the address inside a token is a claim the server confirms. See
-[Publishing](/cli/publish).
+An exchange token also encodes the instance address and tenant. That's a convenience for
+`cordango login` rather than an authority. The address inside a token is a claim the server
+confirms. See [Publishing](/cli/publish).
 
 ## What a key can do
 
@@ -55,6 +55,6 @@ A key acts as you. It carries your relationships and the roles those grant, so i
 what you can reach and nothing else.
 
 <Warning>
-`cordango logout` forgets a credential on the machine it is run on. It does not revoke it. To make
-a key stop working everywhere, delete it on the instance.
+`cordango logout` forgets a credential on the machine it runs on. It doesn't revoke it. To make a
+key stop working everywhere, delete it on the instance.
 </Warning>

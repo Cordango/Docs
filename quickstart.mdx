@@ -3,8 +3,8 @@ title: Quickstart
 description: "From an empty directory to a running application."
 ---
 
-Everything on this page happens on your machine. There is no account, no database, no model API and
-no network call until you choose to publish.
+Everything on this page happens on your machine. No account, no database, no model API and no
+network call until you choose to publish.
 
 <Steps>
   <Step title="Install the CLI">
@@ -40,7 +40,7 @@ no network call until you choose to publish.
     cordango targets
     ```
 
-    Each target reports what it can generate and what it deliberately will not. Ask whether one
+    Each target reports what it can generate and what it deliberately won't. Ask whether one
     specific target can build one specific app:
 
     ```bash
@@ -54,8 +54,8 @@ no network call until you choose to publish.
     ```
 
     That writes a complete ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify project into
-    `./out`. It is ordinary source code and it is yours. There is no license server, no account and
-    no runtime dependency on Cordango in what comes out.
+    `./out`. It's ordinary source code, and it's yours. What comes out has no license server, no
+    account and no runtime dependency on Cordango.
   </Step>
 
   <Step title="Run it">
@@ -64,21 +64,21 @@ no network call until you choose to publish.
     ```
 
     The first screen asks you to create the administrator account. A password delivered by a log
-    line is not delivered, so the endpoint that creates that first account closes for good once it
-    has been used.
+    line isn't really delivered, so the endpoint that creates that first account closes for good
+    once it has been used.
   </Step>
 </Steps>
 
-## When the generator cannot finish
+## When the generator can't finish
 
-Missing behaviour is loud. If an app uses something the target cannot generate yet, the build
-refuses rather than quietly producing an application that is subtly wrong.
+Missing behaviour is loud. If an app uses something the target can't generate yet, the build refuses
+instead of quietly producing an application that's subtly wrong.
 
 ```bash
 cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
 ```
 
-`--allow-incomplete` accepts the build anyway, and tells you exactly what was left out.
+`--allow-incomplete` accepts the build anyway, and tells you exactly what got left out.
 
 ## Next
 

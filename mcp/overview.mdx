@@ -9,8 +9,8 @@ import PlatformBeta from "/snippets/platform-beta.mdx";
 
 <Note>
 **Standalone apps have this today.** Every app built with `cordango build --target standalone` serves
-an MCP endpoint at `/mcp`, on by default. The hosted platform's own MCP facade is still being built —
-the open questions at the bottom of this page are about that one.
+an MCP endpoint at `/mcp`, on by default. The hosted platform's own MCP facade is still being built,
+and the open questions at the bottom of this page are about that one.
 </Note>
 
 ## The intent
@@ -29,9 +29,9 @@ An app is meant to have three faces over one security, entitlement and audit lay
   </Card>
 </CardGroup>
 
-The point of the split is that MCP is not a separate integration with its own permission model. It
-projects the operations that already exist, through the same checks the REST facade goes through,
-so an AI client acting as you can reach exactly what you can reach.
+MCP isn't a separate integration with its own permission model. That's the whole point of splitting
+it this way. It projects operations that already exist, through the same checks the REST facade goes
+through, so an AI client acting as you can reach exactly what you can reach.
 
 ## In a standalone app
 
@@ -56,29 +56,29 @@ Eight, whatever the app contains:
 | `create_record` | Add one |
 | `update_record` | Change the fields you name, leaving the rest alone |
 | `delete_record` | Remove one |
-| `run_command` | Run one of the app's own actions — approve, close, assign |
+| `run_command` | Run one of the app's own actions (approve, close, assign) |
 | `aggregate_records` | Count or total, computed by the database |
 
 Deliberately not one tool set per entity. A client pays for the tool list on every request, so an app
-with twenty entities would otherwise publish eighty tools and charge for that list every time. Here
-the cost is constant and `describe_app` is how a client learns the fields. The entity parameter
-carries an `enum` of the app's real entity keys, so a client can make its first call without a
-round trip.
+with twenty entities would otherwise publish eighty tools and charge for that list every time. This
+way the cost stays constant, and `describe_app` is how a client learns the fields. The entity
+parameter carries an `enum` of the app's real entity keys, so a client can make its first call
+without a round trip.
 
 ### Permissions
 
-Nothing is reachable over MCP that is not reachable over REST. Every tool goes through the same
+Nothing is reachable over MCP that isn't reachable over REST. Every tool goes through the same
 gateway the controllers do, so the app's roles decide each call, fields your role may not read are
-absent from the answer rather than null, and a refusal carries the same stable code — for example
-`record.create_denied` — that the REST route returns.
+absent from the answer rather than null, and a refusal carries the same stable code the REST route
+returns, for example `record.create_denied`.
 
-`describe_app` reports your own permissions per entity, so a client can plan rather than discover its
-limits by being refused halfway through a task.
+`describe_app` reports your own permissions per entity, so a client can plan instead of discovering
+its limits by being refused halfway through a task.
 
 ### Connecting
 
-An MCP client is not a browser: it has no session cookie. Mint an **access key** under *Access keys*
-in the app's navigation and send it as a bearer token.
+An MCP client isn't a browser, so it has no session cookie. Mint an **access key** under *Access
+keys* in the app's navigation and send it as a bearer token.
 
 ```
 POST /mcp
@@ -88,19 +88,19 @@ Mcp-Method: tools/list
 Accept: application/json, text/event-stream
 ```
 
-A key acts as the person who created it — same roles, same audit trail — expires if they gave it a
-date, and stops working the moment their account is locked. Only a hash of it is stored, so it is
-shown once and cannot be recovered; mint a new one instead.
+A key acts as the person who created it, with the same roles and the same audit trail. It expires if
+they gave it a date, and it stops working the moment their account is locked. Only a hash of it is
+stored, so it's shown once and can't be recovered. Mint a new one instead.
 
-The transport is Streamable HTTP at protocol revision `2026-07-28`, which is stateless: there is no
+The transport is Streamable HTTP at protocol revision `2026-07-28`, which is stateless. There's no
 `initialize` handshake and no session, so the endpoint works unchanged behind a load balancer or
 scaled to several containers.
 
 <Note>
 Discovery is provisional. The app also serves a server card at `/.well-known/mcp/server-card.json`,
-which is the path [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
-proposes — an open proposal rather than part of the specification. Expect it to move, and do not
-build anything that depends on finding it there.
+the path [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
+proposes. That's an open proposal, not part of the specification. Expect it to move, and don't build
+anything that depends on finding it there.
 </Note>
 
 ### Turning it off
@@ -110,20 +110,20 @@ OpenAPI document are unaffected.
 
 ## On the hosted platform
 
-The REST facade is real and documented. It is generated from the app's manifest, and each app
+The REST facade is real and documented. It's generated from the app's manifest, and each app
 publishes its own OpenAPI document:
 
 ```
 GET /api/app/{handle}/openapi.json
 ```
 
-Until the platform's MCP facade lands, that document is the practical route for an AI client: point a
-tool generator at it and you get the app's real entities and fields rather than a generic shape.
+Until the platform's MCP facade lands, that document is the practical route for an AI client. Point
+a tool generator at it and you get the app's real entities and fields rather than a generic shape.
 
 ## Open questions
 
-These are about the **hosted platform** and are undecided rather than merely undocumented:
+These are about the **hosted platform**, and they're undecided rather than merely undocumented:
 
 - Whether a per-app server, a workspace-level aggregator gateway, or both.
 - Tier gating. Platform MCP is planned as a paid-tier feature. A standalone app's own MCP endpoint is
-  part of the open-source runtime and is not gated.
+  part of the open-source runtime and isn't gated.

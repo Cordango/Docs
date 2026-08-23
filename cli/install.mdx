@@ -3,8 +3,8 @@ title: Install
 description: "Install the cordango CLI."
 ---
 
-The CLI is one self-contained binary of about 39 MB that carries its own runtime. It does not need
-.NET installed, not the SDK, not the runtime, not ICU. Uninstalling is deleting the file.
+The CLI is one self-contained binary of about 39 MB that carries its own runtime. No .NET install
+needed, no SDK, no runtime, no ICU. Uninstalling is deleting the file.
 
 <CodeGroup>
 ```bash macOS and Linux
@@ -38,6 +38,6 @@ so these numbers matter when you come back to a project later.
   directory and the error wire.
 </ResponseField>
 
-You do not install this one. A generated application emits it as source, so what comes out of
+You don't install this one. A generated application emits it as source, so what comes out of
 `cordango build` has no dependency on a feed. `--runtime package` references it from NuGet instead,
 pinned to the version of the generator that wrote the project file.

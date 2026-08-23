@@ -7,9 +7,8 @@ import PlatformBeta from "/snippets/platform-beta.mdx";
 
 <PlatformBeta />
 
-Every app that has been built exposes a generic, manifest-driven REST facade. It is the same
-surface the Cordango frontend uses, so anything the product can do to a record, you can do over
-HTTP.
+Every app that has been built exposes a generic, manifest-driven REST facade. It's the same surface
+the Cordango frontend uses, so anything the product can do to a record, you can do over HTTP.
 
 ## Base URL
 
@@ -20,10 +19,10 @@ https://{workspace}.cordango.com/api/app/{handle}
 `{handle}` is the app's handle, not its id. A GUID also resolves, so older links keep working, but
 the handle is the address to write down.
 
-There is no single shared `api.cordango.com`. A Cordango instance is your workspace, on your
+There's no single shared `api.cordango.com`. A Cordango instance is your workspace, on your
 subdomain, or on a host you run yourself.
 
-## What is on it
+## What's on it
 
 | Method | Path | What it does |
 | --- | --- | --- |
@@ -36,7 +35,7 @@ subdomain, or on a host you run yourself.
 | `PUT` | `/data/{entity}/{recordId}` | Replace a record. |
 | `DELETE` | `/data/{entity}/{recordId}` | Delete a record. |
 
-The app must have been built. These routes are driven by the manifest, so without one there is
+The app has to have been built. These routes are driven by the manifest, so without one there's
 nothing to drive them.
 
 <Tip>
@@ -57,18 +56,18 @@ language. Branch on `code`, show `error`.
 }
 ```
 
-Where an operation can fail several ways at once, the body also carries `codes` and `errors`
-arrays, and the first entry is repeated under `code` and `error`.
+Where an operation can fail several ways at once, the body also carries `codes` and `errors` arrays,
+and the first entry is repeated under `code` and `error`.
 
 ## Status codes
 
 <ResponseField name="404" type="no relationship">
   You have no relationship to this app at all. It answers the same way a genuinely missing app
-  does, on purpose: whether an app exists is not something an unrelated caller gets to learn.
+  does, on purpose: whether an app exists isn't something an unrelated caller gets to learn.
 </ResponseField>
 
 <ResponseField name="403" type="the role denies it">
-  You have a relationship, and the roles it grants do not permit this operation.
+  You have a relationship, and the roles it grants don't permit this operation.
 </ResponseField>
 
 Read responses drop fields your role may not read. Writes that touch fields your role may not set

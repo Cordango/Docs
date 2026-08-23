@@ -44,7 +44,7 @@ attempt costs nothing and needs no cleanup, which is what makes it safe to let a
 </Tabs>
 
 Upserts, deliberately. An operation that describes the state a thing should be in can be applied
-twice without a different result, which matters when the thing applying it is retrying.
+twice without a different result, which matters when whatever is applying it decides to retry.
 
 ## Ask what an operation may say
 
@@ -55,11 +55,11 @@ cordango vocabulary operation upsert_field
 
 The operation vocabulary is a different question from the App Definition's, and for a while it was
 the one nobody could ask. An agent worked it out by submitting deliberately invalid operations and
-reading the rejections. The schemas existed the whole time; nothing exposed them.
+reading the rejections. The schemas had existed the whole time. Nothing exposed them.
 
 <Warning>
 An operation and a file spell some things differently. A reference's target is `target` in an
-operation and `targetEntity` in a file; a trigger is `on` against `trigger`. `cordango vocabulary`
+operation and `targetEntity` in a file. A trigger is `on` against `trigger`. `cordango vocabulary`
 lists every pair. See [the schema](/concepts/schema).
 </Warning>
 
@@ -89,7 +89,7 @@ lists every pair. See [the schema](/concepts/schema).
 }
 ```
 
-`note` is for the human reading the diff later.
+`note` is for whoever reads the diff later.
 
 ## See it before you do it
 
@@ -106,18 +106,18 @@ cordango check --app support
 git diff
 ```
 
-`cordango apply` writes to the working tree. It does not stage, does not commit, and does not
-validate on your behalf. A person reads the diff and decides.
+`cordango apply` writes to the working tree. It doesn't stage, commit, or validate anything on your
+behalf. A person reads the diff and decides.
 
 ## Why not just edit the file
 
 For a one-line change, do edit the file. Operations earn their place in three situations:
 
-**Scope enforcement.** The guarantee that a change cannot touch anything outside one aggregate is
+**Scope enforcement.** The guarantee that a change can't touch anything outside one aggregate is
 worth having when the thing making the change is a model.
 
-**Refusal is free.** A rejected operation set leaves the tree exactly as it was. There is no
+**Refusal is free.** A rejected operation set leaves the tree exactly as it was, with no
 half-applied state to clean up.
 
-**They describe intent.** `upsert_field` on `ticket` is a reviewable statement about what was
-meant. A YAML diff shows what changed but not why it was one change.
+**They describe intent.** `upsert_field` on `ticket` is a reviewable statement about what was meant.
+A YAML diff shows what changed but not why it was one change.

@@ -6,8 +6,8 @@ description: "Every cordango command in this build."
 import PlatformBeta from "/snippets/platform-beta-inline.mdx";
 
 
-Everything in the first table works with no instance, no account and no network. That split is
-worth seeing at a glance, so the CLI's own help prints it the same way.
+Everything in the first table works with no instance, no account and no network. That split is worth
+seeing at a glance, so the CLI's own help prints it the same way.
 
 Every command accepts `--json`.
 
@@ -19,15 +19,15 @@ Every command accepts `--json`.
 | `cordango add app <name>` | Add another app to this workspace. One workspace holds many. |
 | `cordango import <app.definition.json> [--app <name>]` | Bring an existing App Definition in as source files you can edit. |
 | `cordango check [--app <key>] [--target <id>]` | Parse, lower and validate. No model, no database. With `--target`, also ask whether that generator can build it. |
-| `cordango validate [--app <key>] [--target <id>]` | The same command; the word for asking about a target. |
-| `cordango targets` | What this build can generate, and what each target deliberately will not. |
+| `cordango validate [--app <key>] [--target <id>]` | The same command, spelled the other way. |
+| `cordango targets` | What this build can generate, and what each target deliberately won't. |
 | `cordango build [--app <key>]` | Write `.cordango/build/<key>/` artifacts. Deterministic. |
 | `cordango build --app <key> --target <id> --out <dir>` | Generate a whole application into a directory you own. |
 | `cordango inspect [path] [--app <key>]` | Describe the workspace, one app, or one aggregate. |
 | `cordango vocabulary [<name>]` | What may be written: Cord's words, or one construct's schema. |
 | `cordango apply <ops.json> --app <key> --scope <kind[:key]>` | Apply semantic operations and rewrite the affected source files. |
 | `cordango fmt [--app <key>]` | Rewrite every `.cordango.yaml` file in canonical form. |
-| `cordango doctor` | Check the workspace for problems that are not source errors. |
+| `cordango doctor` | Check the workspace for problems that aren't source errors. |
 | `cordango version` | CLI, source-format and App Definition schema versions. |
 
 <PlatformBeta />
@@ -59,7 +59,7 @@ cordango build --app support --target dotnet-vue --out ./out
 </ParamField>
 
 <ParamField path="--allow-incomplete" type="flag">
-  Accept a build the generator cannot finish, and report what was left out. Without it, missing
+  Accept a build the generator can't finish, and report what got left out. Without it, missing
   behaviour refuses the build.
 </ParamField>
 
@@ -79,4 +79,4 @@ cordango check --app support --target dotnet-vue
 No model, no database, no network. This is the command for a pre-commit hook and for CI, and it
 works from a clone of the open source repository with nothing else installed.
 
-`cordango validate` is the same command. Use whichever word fits the sentence you are writing.
+`cordango validate` is the same command. Use whichever word fits the sentence you're writing.

@@ -14,15 +14,14 @@ cordango targets
 
 `dotnet-vue` is the first-party one: ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify.
 
-What it produces serves three faces from one process — the application, a REST API documented at
-`/scalar` from a real OpenAPI 3.1 document at `/openapi/v1.json`, and an [MCP endpoint](/mcp/overview)
-at `/mcp` — all three going through the same permissions.
+What it produces serves three faces from one process. The application itself, a REST API documented
+at `/scalar` from a real OpenAPI 3.1 document at `/openapi/v1.json`, and an
+[MCP endpoint](/mcp/overview) at `/mcp`. All three go through the same permissions.
 
 ## Every target declares both halves
 
-A target reports what it supports and, separately, what it deliberately withholds. Those are not
-the same as each other, and neither is the same as a third case: something the target has never
-heard of.
+A target reports what it supports and, separately, what it deliberately withholds. Those aren't the
+same thing, and neither one is the third case: a construct the target has never heard of.
 
 <ResponseField name="Supported" type="it builds">
   The target generates this.
@@ -49,7 +48,7 @@ cordango check --app support --target dotnet-vue
 ```
 
 Without `--target` this is an ordinary validity check. With one, it also answers whether that
-generator can build this app, and lists anything it cannot.
+generator can build this app, and lists anything it can't.
 
 ## Missing behaviour is loud
 
@@ -57,22 +56,21 @@ generator can build this app, and lists anything it cannot.
 cordango build --app support --target dotnet-vue --out ./out
 ```
 
-If the app uses something the target cannot generate, this **refuses**. It does not quietly emit an
-application with a workflow silently missing, because an app that looks finished and is not is worse
-than a build that failed.
+If the app uses something the target can't generate, this **refuses**. It won't quietly hand you an
+application with a workflow missing, because an app that looks finished and isn't is worse than a
+build that failed.
 
 ```bash
 cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
 ```
 
-`--allow-incomplete` accepts it anyway and prints exactly what was left out. That is the right flag
-while you are still building. It is the wrong flag for a release.
+`--allow-incomplete` accepts it anyway and prints exactly what got left out. Right flag while you're
+still building, wrong flag for a release.
 
 ## The generated project is yours
 
-There is no runtime dependency on Cordango in the output. No license server, no account, no model
-API. It is an ordinary ASP.NET Core and Vue project, and it keeps working whether or not this
-project does.
+The output has no runtime dependency on Cordango. No license server, no account, no model API. It's
+an ordinary ASP.NET Core and Vue project, and it keeps working whether or not this project does.
 
 <ParamField path="--runtime package" type="flag">
   Reference `Cordango.Standalone` from NuGet instead of emitting it as source. The default emits
@@ -85,15 +83,15 @@ project does.
 
 <PlatformBeta />
 
-## One definition, two products
+## One definition, two destinations
 
 The same App Definition runs on the Cordango Platform and generates a standalone application. What
-differs is what each supports.
+each supports is where they differ.
 
-Cordango Open Source builds **one** application: its own backend, frontend, database, users,
+The standalone target builds **one** application: its own backend, frontend, database, users,
 authentication and permissions. Not multi-tenant, no AI at runtime.
 
 Cordango Platform runs **many** applications as one company system: shared people and organizations
 across apps, cross-app references, audit history, governance, AI, search and managed hosting.
 
-Neither one silently drops what it cannot do.
+Neither one drops something it can't do without telling you.

@@ -25,11 +25,11 @@ The scaffold ships its own `docker-compose.yml` with the database alongside the 
 
 ## The first screen creates the administrator
 
-There is no default password, and no password printed to a log. A password delivered by a log line
-is not delivered: it sits in a scrollback, a log aggregator and a CI artifact, and nobody ever
+There's no default password, and nothing printed to a log. A password delivered by a log line isn't
+really delivered. It sits in a scrollback, a log aggregator and a CI artifact, and nobody ever
 rotates it.
 
-Instead the first screen asks you to create the account. Once that has happened, the endpoint that
+So the first screen asks you to create the account instead. Once that's happened, the endpoint that
 creates it **closes for good**.
 
 <Warning>
@@ -40,7 +40,7 @@ the world and open it once you have signed in.
 
 ## The key ring lives on the volume
 
-Data protection keys must persist. If they live inside the container, every restart invalidates
+Data protection keys have to persist. If they live inside the container, every restart invalidates
 every existing session and every token signed with them.
 
 The generated compose file puts them on a volume. Keep that arrangement when you move to whatever
@@ -48,12 +48,12 @@ you actually deploy on, and back that volume up with the database rather than se
 
 ## Migrations
 
-The generated project includes an EF Core migration for the schema its definition describes. It is
-certified: regenerating it produces an empty diff, so what is in the project is exactly what the
-model implies.
+The generated project includes an EF Core migration for the schema its definition describes. It's
+certified, meaning regenerating it produces an empty diff, so what sits in the project is exactly
+what the model implies.
 
-When you change the app and regenerate, you get a new migration. Review it like any other, because
-a generated migration is still a migration and it still runs against real data.
+Change the app, regenerate, and you get a new migration. Review it like any other. A generated
+migration is still a migration, and it still runs against real data.
 
 ## Choosing how the runtime arrives
 
@@ -76,10 +76,10 @@ generate outlives its generator.
 cordango build --app support --target dotnet-vue --out ./out --seed 7
 ```
 
-Deterministic demo data. The same seed produces the same dataset, which makes it useful for a demo
-environment and for a screenshot that has to look the same next week.
+Deterministic demo data. The same seed produces the same dataset, which is what you want for a demo
+environment, or for a screenshot that has to look the same next week.
 
-It is demo data. Do not ship it to production and do not build a report against it.
+It's demo data. Don't ship it to production, and don't build a report against it.
 
 <PlatformBeta />
 

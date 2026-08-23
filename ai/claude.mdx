@@ -4,7 +4,7 @@ description: "Starting prompt and setup for Claude Code."
 ---
 
 Claude Code reads `CLAUDE.md` from the workspace root automatically, and `cordango new` writes one.
-There is nothing to configure.
+There's nothing to configure.
 
 <Steps>
   <Step title="Create the workspace">
@@ -56,8 +56,8 @@ Run cordango check when you are done, and show me the diff. Do not commit.
 
 ## Starting from nothing
 
-When there is no app yet, describe the job rather than the data model. Cordango's whole point is
-that it works out the second from the first.
+When there's no app yet, describe the job rather than the data model. Cordango's whole point is
+working out the second from the first.
 
 ```text
 Build a support desk app in this workspace.
@@ -74,9 +74,9 @@ before you write any files.
 ```
 
 <Tip>
-"Stop and show me the plan first" is worth the extra turn. The one change that is genuinely painful
-to undo later is duplicating an entity that a core app already provides, and that decision happens
-in the first thirty seconds.
+"Stop and show me the plan first" is worth the extra turn. The one change that's genuinely painful
+to undo later is duplicating an entity a core app already provides, and that decision gets made in
+the first thirty seconds.
 </Tip>
 
 ## A reusable command
@@ -98,7 +98,7 @@ For each app, report one of three outcomes:
 Do not fix anything unless I ask. Just report.
 ```
 
-## What it will not do
+## What it won't do
 
 `CLAUDE.md` tells it not to commit and not to accept its own work. `cordango apply` writes to the
 working tree, and a person reads `git diff` and stages it. If you want that changed, change it in

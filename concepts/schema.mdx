@@ -3,7 +3,7 @@ title: The schema
 description: "The contract behind the App Definition, and how to ask it questions."
 ---
 
-The App Definition is validated against a JSON Schema. A document that does not validate is never
+The App Definition is validated against a JSON Schema. A document that doesn't validate is never
 built and never deployed.
 
 | | |
@@ -12,8 +12,8 @@ built and never deployed.
 | Size | About 212 KB, 81 definitions |
 | Where it lives | Embedded in the `cordango` binary you installed |
 
-That last row is the important one. The schema is not a file you fetch, keep in sync, or point a
-tool at. It ships inside the CLI, which is why the CLI can answer every question about it.
+That last row is the important one. The schema isn't a file you fetch, keep in sync, or point a tool
+at. It ships inside the CLI, which is why the CLI can answer every question about it.
 
 ## Ask the CLI
 
@@ -25,14 +25,14 @@ cordango vocabulary operation           # what a semantic operation may say
 cordango vocabulary core organizations  # what a core app holds
 ```
 
-Answers come from the schema compiled into your build, so they cannot drift from what your CLI will
+Answers come from the schema compiled into your build, so they can't drift from what your CLI will
 accept. Each answer covers one construct: `block_calendar` is about 5 KB against the schema's
 212 KB, so asking one question costs a fraction of the document.
 
 References are named rather than inlined. That keeps an answer small and points you at the next
 question instead of flattening the whole tree into one wall of output.
 
-## Do not read the schema
+## Don't read the schema
 
 This is the point of the page, and it applies to people and agents alike.
 
@@ -41,20 +41,20 @@ If you are opening a schema file, or scraping the binary, to work out what to wr
 `cordango vocabulary` instead.
 </Warning>
 
-That warning is not hypothetical. An agent working in a real workspace went looking for the
-settings a calendar view accepts, found no way to ask, and extracted the embedded JSON Schema by
-scraping strings out of the 78 MB executable. It got the right answer by the most fragile route
-available, and it was about to pull the whole schema in next.
+That warning isn't hypothetical. An agent working in a real workspace went looking for the settings
+a calendar view accepts, found no way to ask, and extracted the embedded JSON Schema by scraping
+strings out of the 78 MB executable. It got the right answer by the most fragile route available,
+and it was about to pull the whole schema in next.
 
-The agent was not misbehaving. It filled a hole. `cordango vocabulary` is that hole filled.
+The agent wasn't misbehaving, it was filling a hole. `cordango vocabulary` is that hole filled.
 
-If `cordango vocabulary` cannot answer a question about what may be written, that is a gap worth
-reporting rather than working around.
+So if `cordango vocabulary` can't answer a question about what may be written, we'd rather hear
+about the gap than have you work around it.
 
 ## Where one idea has two names
 
-An operation is what you **send**. A file is what gets **written**. They diverged for defensible
-reasons at each step, and the sum is a seam. These are the pairs:
+An operation is what you **send**. A file is what gets **written**. Each divergence between them had
+a defensible reason at the time, and added up they're a seam. These are the pairs:
 
 | The idea | In an operation | In a file |
 | --- | --- | --- |
@@ -72,7 +72,7 @@ and error before it was written down.
 
 ## Validating
 
-You do not run a validator. Two commands already do it.
+There's no separate validator to run. Two commands already do it.
 
 **On your source**, which is what you almost always want:
 
@@ -90,7 +90,7 @@ cordango import ./app.definition.json --app support
 ```
 
 `import` puts the document through the same schema gate before it writes anything. A document that
-does not validate does not become source files.
+doesn't validate never becomes source files.
 
 ## Versions
 
@@ -103,10 +103,10 @@ Three numbers: the CLI version, the source format version, and the App Definitio
 
 ## Maintaining the schema itself
 
-Only relevant if you are working on Cordango rather than with it. The schema is authored as
+Only relevant if you're working on Cordango rather than with it. The schema is authored as
 per-concern source files under `schemas/src/` (domain, ui, behavior, notifications, security, and a
 root holding the envelope and shared primitives) and composed into the single stored contract, with
 a CI guard that fails if the two drift apart.
 
-That is a detail of [the repository](https://github.com/cordango/cordango), not something the CLI
+That's a detail of [the repository](https://github.com/cordango/cordango), not something the CLI
 asks of you.

@@ -23,7 +23,7 @@ against the same `CLAUDE.md` a Cordango workspace already ships.
 Put that in `~/.claude/settings.json` for every project, or in `.claude/settings.json` for this
 workspace only. Get a key from [z.ai](https://z.ai/manage-apikey/apikey-list).
 
-The long timeout is not decoration. A whole-app generation pass is a long single call, and the
+The long timeout isn't decoration. A whole-app generation pass is a long single call, and the
 default will cut it off partway.
 
 Everything on the [Claude Code page](/ai/claude) applies from here: the same `CLAUDE.md`, the same
@@ -88,14 +88,14 @@ Never edit `.cordango/`. Do not commit.
 ## What to watch for
 
 **Check that it actually ran check.** Ask for the output rather than a summary of it. `cordango
-check` is free, so there is no reason for a step to be reported rather than run.
+check` is free, so there's no reason for a step to be reported rather than run.
 
 **Watch for a second copy of a core entity.** The Phase 1 stop exists for this. A `company` or
-`customer` entity appearing in Phase 2 means Phase 1 was skimmed, and it is the one mistake that is
+`customer` entity appearing in Phase 2 means Phase 1 got skimmed, and that's the one mistake that's
 genuinely awkward to unwind later.
 
 **Keep the scope narrow.** If a turn produced a diff touching more aggregates than you asked for,
-revert it and re-ask with the sequence written out. That is cheaper than reviewing it.
+revert it and re-ask with the sequence written out. That's cheaper than reviewing it.
 
 <Note>
 None of this is specific to GLM being worse. Explicit sequencing produces tighter diffs from every

@@ -9,24 +9,24 @@ cordango check --app support
 cordango check --json
 ```
 
-Parse, lower, validate. No model, no database, no network, no account. It is free, and it is meant
-to be run constantly.
+Parse, lower, validate. No model, no database, no network, no account. It's free, and it's meant to
+be run constantly.
 
 ## Three outcomes, not two
 
 <ResponseField name="not coherent" type="error">
-  The app does not hold together: a reference points at nothing, a lifecycle names a state that
-  does not exist, a screen is bound to a field that was removed. Fix it.
+  The app doesn't hold together: a reference points at nothing, a lifecycle names a state that
+  doesn't exist, a screen is bound to a field that was removed. Fix it.
 </ResponseField>
 
 <ResponseField name="coherent, incomplete" type="not an error">
-  It holds together but is not a finished application yet. No screen to land on, nothing to create.
+  It holds together but isn't a finished application yet. No screen to land on, nothing to create.
   This is the normal state mid-build, and treating it as a failure would make "look at it running"
-  the one thing you cannot do while building.
+  the one thing you can't do while building.
 </ResponseField>
 
 <ResponseField name="coherent, complete" type="done">
-  It holds together and it is a whole application.
+  It holds together and it's a whole application.
 </ResponseField>
 
 Only the first is a failure. A CI job that fails on the second will fail on every honest work in
@@ -38,8 +38,8 @@ progress, which teaches everyone to ignore it.
 cordango check --app support --target dotnet-vue
 ```
 
-A separate question from validity. This asks whether that specific generator can build this app,
-and lists anything it cannot. See [Targets](/concepts/targets).
+A separate question from validity. This asks whether that specific generator can build this app, and
+lists anything it can't. See [Targets](/concepts/targets).
 
 ## In CI
 
@@ -65,9 +65,9 @@ jobs:
           git diff --exit-code
 ```
 
-That second step is worth having. `cordango fmt` is deterministic, so a non-empty diff after
-running it means someone hand-edited and did not format, and every subsequent diff in that file
-will be noisier than it needs to be.
+That second step is worth having. `cordango fmt` is deterministic, so a non-empty diff after running
+it means someone hand-edited and didn't format, and every diff in that file after theirs will be
+noisier than it needs to be.
 
 ## Checking the workspace rather than the apps
 
@@ -75,16 +75,16 @@ will be noisier than it needs to be.
 cordango doctor
 ```
 
-Problems that are not source errors: an app registered in `cordango.yaml` whose directory is gone,
-a credential pointing at an instance that no longer exists. `check` is about an app. `doctor` is
-about the workspace around it.
+Problems that aren't source errors: an app registered in `cordango.yaml` whose directory is gone, a
+credential pointing at an instance that no longer exists. `check` is about an app. `doctor` is about
+the workspace around it.
 
 ## Before publishing
 
-`cordango publish` runs the same pipeline itself, and it will not send a workspace that does not
-hold together. It also checks **every** selected app before sending **any** of them, because
-publishing three apps and failing on the fourth would leave an instance holding half a workspace
-whose cross-app references no longer resolve.
+`cordango publish` runs the same pipeline itself, and it won't send a workspace that doesn't hold
+together. It also checks **every** selected app before sending **any** of them, because publishing
+three apps and failing on the fourth would leave an instance holding half a workspace whose
+cross-app references no longer resolve.
 
-So you do not have to check first. It is still worth checking first, because a failure at your
-terminal is cheaper than a failure halfway through a deploy.
+So you don't have to check first. Do it anyway. A failure at your terminal is cheaper than one
+halfway through a deploy.
