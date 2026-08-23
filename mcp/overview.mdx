@@ -1,19 +1,11 @@
 ---
 title: Overview
-description: "Where MCP fits, and what exists today."
+description: "The MCP surface over a workspace and over one app."
 ---
 
 import PlatformBeta from "/snippets/platform-beta.mdx";
 
 <PlatformBeta />
-
-<Note>
-**Standalone apps have this today.** Every app built with `cordango build --target standalone` serves
-an MCP endpoint at `/mcp`, on by default. The hosted platform's own MCP facade is still being built,
-and the open questions at the bottom of this page are about that one.
-</Note>
-
-## The intent
 
 An app is meant to have three faces over one security, entitlement and audit layer:
 
@@ -31,11 +23,149 @@ An app is meant to have three faces over one security, entitlement and audit lay
 
 MCP isn't a separate integration with its own permission model. That's the whole point of splitting
 it this way. It projects operations that already exist, through the same checks the REST facade goes
-through, so an AI client acting as you can reach exactly what you can reach.
+through, so an AI client acting as you can reach exactly what you can reach and nothing else.
+
+## Two endpoints
+
+A Cordango workspace serves MCP at two levels. Same tools, same auth, different blast radius.
+
+| | Endpoint | What the client sees |
+| --- | --- | --- |
+| Workspace | `https://acme.cordango.com/mcp` | Every app you have a relationship with, plus the core apps |
+| One app | `https://acme.cordango.com/mcp/app/support` | That app only |
+
+Point a general assistant at the workspace endpoint. Point a narrow agent, the one that files
+tickets and does nothing else, at the app endpoint, because an agent that can't see billing can't
+be talked into touching it.
+
+## The tools
+
+Twelve at the workspace endpoint, whatever the workspace contains. The app endpoint serves nine of
+them, dropping `list_apps`, `describe_workspace` and `find_related` along with the `app` parameter,
+because there's no second app for them to mean anything about.
+
+| Tool | What it does |
+| --- | --- |
+| `list_apps` | Every app you can reach, its handle, what it's for, and what you may do in it |
+| `describe_app` | One app: its entities, their fields as JSON Schema, its commands, and your own permissions on each |
+| `list_records` | A page of records, with filters and sorting |
+| `get_record` | One record by id |
+| `create_record` | Add one |
+| `update_record` | Change the fields you name, leaving the rest alone |
+| `delete_record` | Remove one |
+| `run_command` | Run one of the app's own actions (approve, close, assign) |
+| `aggregate_records` | Count or total, computed by the database |
+| `find_related` | Everything across every app that points at one record |
+| `search` | Text search across the apps you can reach |
+| `describe_workspace` | The apps, the core apps, and how they reference each other |
+
+Deliberately not one tool set per entity, and not one per app. A client pays for the tool list on
+every request, so a workspace with six apps and twenty entities each would otherwise publish several
+hundred tools and charge for that list every time. This way the cost stays constant no matter how
+big the workspace gets, and `describe_app` is how a client learns the shape of one app when it needs
+to.
+
+The `app` and `entity` parameters carry an `enum` of the real handles and keys you can reach, so a
+client can make its first useful call without a round trip.
+
+## Cross-app questions
+
+This is the part a per-app integration can't do, and the reason the workspace endpoint exists.
+
+Every app in a workspace shares one data model. A customer is a record in
+[core Organizations](/concepts/core-apps), and the support app, the billing app and the sales app
+all reference that same record rather than keeping three copies of a company with three addresses.
+So a question that spans them is a lookup, not an integration project.
+
+```json
+{
+  "name": "find_related",
+  "arguments": {
+    "app": "core_organizations",
+    "entity": "organization",
+    "recordId": "0d0c…",
+    "in": ["support", "billing", "sales"]
+  }
+}
+```
+
+That comes back with the open tickets, the unpaid invoices and the deal in progress, each labelled
+with the app it came from. Leave `in` out and it searches every app you can reach.
+
+An assistant asked "what is going on with Contoso" makes two calls. `search` to find the
+organization, then `find_related` to collect everything hanging off it. Nothing had to be joined
+ahead of time.
+
+<Note>
+`aggregate_records` runs inside one app, because the aggregate is computed by the database and the
+answer has to be exact. It can still **group by** a cross-app reference, so "open tickets by
+customer industry" works even though industry lives in core Organizations and tickets live in
+support.
+</Note>
+
+Two things `find_related` deliberately does not do. It doesn't follow a chain further than one hop,
+because a client asking for everything two hops from a company gets the whole workspace back. And it
+doesn't cross a permission boundary to tell you a record exists: an app you have no relationship
+with is absent from the answer, exactly as it would be from `list_apps`.
+
+## Permissions
+
+Nothing is reachable over MCP that isn't reachable over REST. Every tool goes through the same
+gateway the controllers do, so:
+
+- The app's roles decide each call.
+- Fields your role may not read are absent from the answer rather than null.
+- A refusal carries the same stable code the REST route returns, for example
+  `record.create_denied`.
+- An app you have no relationship with answers as a missing app does, because whether an app exists
+  isn't something an unrelated caller gets to learn.
+
+`describe_app` and `list_apps` both report your own permissions, so a client can plan instead of
+discovering its limits by being refused halfway through a task.
+
+Every call lands in the workspace audit log with the key that made it. An answer an assistant gave
+last Tuesday is a question you can still ask the audit log about.
+
+## Connecting
+
+An MCP client isn't a browser, so it has no session cookie. Mint a **personal access key** under
+your avatar menu, **Personal Access Keys**, and send it as a bearer token.
+
+```
+POST /mcp
+Authorization: Bearer cord_pat.a1b2c3d4.…
+MCP-Protocol-Version: 2026-07-28
+Mcp-Method: tools/list
+Accept: application/json, text/event-stream
+```
+
+A key acts as the person who created it, with the same relationships, the same roles and the same
+audit trail. It expires if they gave it a date, and it stops working the moment their account is
+locked. Only a hash of it is stored, so it's shown once and can't be recovered. Mint a new one
+instead.
+
+<Warning>
+`cordango logout` forgets a credential on the machine it runs on. It doesn't revoke it. To stop a
+key working everywhere, delete it on the instance. See [Security](/security).
+</Warning>
+
+The transport is Streamable HTTP at protocol revision `2026-07-28`, which is stateless. There's no
+`initialize` handshake and no session, so the endpoint works unchanged behind a load balancer or
+scaled across containers.
+
+<Note>
+Discovery is provisional. The workspace serves a server card at
+`/.well-known/mcp/server-card.json`, the path
+[SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127) proposes. That's
+an open proposal, not part of the specification. Expect it to move, and don't build anything that
+depends on finding it there.
+</Note>
 
 ## In a standalone app
 
-A generated app serves all three faces from one process:
+An application generated by `cordango build` serves its own MCP endpoint, on by default. One app,
+one process, nothing above it, so the tool list is eight: `describe_app` and the seven record tools.
+No `list_apps`, no `find_related`, no workspace search, because there's nothing to cross to.
 
 | | |
 |---|---|
@@ -44,86 +174,22 @@ A generated app serves all three faces from one process:
 | `/openapi/v1.json` | the OpenAPI 3.1 document behind that page |
 | `/mcp` | the MCP endpoint |
 
-### The tools
+Authentication works the same way, with a key minted under *Access keys* in the app's navigation.
+The prefix differs, `cordango_pat.` rather than `cord_pat.`, because a standalone app mints its own
+keys and answers to nothing above it.
 
-Eight, whatever the app contains:
+To turn it off, delete the `AddCordangoMcp` and `MapCordangoMcp` lines from `api/Program.cs`. The
+REST facade and the OpenAPI document are unaffected.
 
-| Tool | What it does |
-|---|---|
-| `describe_app` | Every entity, its fields as JSON Schema, its commands, and what **you** may do with each |
-| `list_records` | A page of records, with filters and sorting |
-| `get_record` | One record by id |
-| `create_record` | Add one |
-| `update_record` | Change the fields you name, leaving the rest alone |
-| `delete_record` | Remove one |
-| `run_command` | Run one of the app's own actions (approve, close, assign) |
-| `aggregate_records` | Count or total, computed by the database |
+## The REST route
 
-Deliberately not one tool set per entity. A client pays for the tool list on every request, so an app
-with twenty entities would otherwise publish eighty tools and charge for that list every time. This
-way the cost stays constant, and `describe_app` is how a client learns the fields. The entity
-parameter carries an `enum` of the app's real entity keys, so a client can make its first call
-without a round trip.
-
-### Permissions
-
-Nothing is reachable over MCP that isn't reachable over REST. Every tool goes through the same
-gateway the controllers do, so the app's roles decide each call, fields your role may not read are
-absent from the answer rather than null, and a refusal carries the same stable code the REST route
-returns, for example `record.create_denied`.
-
-`describe_app` reports your own permissions per entity, so a client can plan instead of discovering
-its limits by being refused halfway through a task.
-
-### Connecting
-
-An MCP client isn't a browser, so it has no session cookie. Mint an **access key** under *Access
-keys* in the app's navigation and send it as a bearer token.
-
-```
-POST /mcp
-Authorization: Bearer cordango_pat.a1b2c3d4.…
-MCP-Protocol-Version: 2026-07-28
-Mcp-Method: tools/list
-Accept: application/json, text/event-stream
-```
-
-A key acts as the person who created it, with the same roles and the same audit trail. It expires if
-they gave it a date, and it stops working the moment their account is locked. Only a hash of it is
-stored, so it's shown once and can't be recovered. Mint a new one instead.
-
-The transport is Streamable HTTP at protocol revision `2026-07-28`, which is stateless. There's no
-`initialize` handshake and no session, so the endpoint works unchanged behind a load balancer or
-scaled to several containers.
-
-<Note>
-Discovery is provisional. The app also serves a server card at `/.well-known/mcp/server-card.json`,
-the path [SEP-2127](https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127)
-proposes. That's an open proposal, not part of the specification. Expect it to move, and don't build
-anything that depends on finding it there.
-</Note>
-
-### Turning it off
-
-Delete the `AddCordangoMcp` and `MapCordangoMcp` lines from `api/Program.cs`. The REST facade and the
-OpenAPI document are unaffected.
-
-## On the hosted platform
-
-The REST facade is real and documented. It's generated from the app's manifest, and each app
-publishes its own OpenAPI document:
+Everything above is also reachable over HTTP, and each app publishes its own OpenAPI document
+generated from its manifest:
 
 ```
 GET /api/app/{handle}/openapi.json
 ```
 
-Until the platform's MCP facade lands, that document is the practical route for an AI client. Point
-a tool generator at it and you get the app's real entities and fields rather than a generic shape.
-
-## Open questions
-
-These are about the **hosted platform**, and they're undecided rather than merely undocumented:
-
-- Whether a per-app server, a workspace-level aggregator gateway, or both.
-- Tier gating. Platform MCP is planned as a paid-tier feature. A standalone app's own MCP endpoint is
-  part of the open-source runtime and isn't gated.
+Point a tool generator at that and you get the app's real entities and fields rather than a generic
+shape. Worth knowing for a client that speaks OpenAPI and not MCP. See the
+[API reference](/api-reference/introduction).
