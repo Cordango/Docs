@@ -1,0 +1,85 @@
+---
+title: MCP Tools
+description: "Reference for all tools available through the Cordango MCP."
+---
+
+## Available Tools
+
+The Cordango MCP exposes the following tools to connected AI models.
+
+### `cordango_query`
+
+Query structured data from your Cordango workspace.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `query` | `string` | ✅ | A natural-language or SQL-like query string. |
+| `workspace_id` | `string` | ✅ | The ID of the workspace to query. |
+| `limit` | `integer` | ❌ | Maximum number of results to return (default: 20). |
+
+**Example input:**
+
+```json
+{
+  "query": "Show me all active users created in the last 7 days",
+  "workspace_id": "ws_abc123",
+  "limit": 10
+}
+```
+
+---
+
+### `cordango_execute`
+
+Execute a predefined workflow in your Cordango workspace.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `workflow_id` | `string` | ✅ | The ID of the workflow to execute. |
+| `inputs` | `object` | ❌ | Key-value pairs to pass as workflow inputs. |
+
+**Example input:**
+
+```json
+{
+  "workflow_id": "wf_xyz789",
+  "inputs": {
+    "email": "user@example.com"
+  }
+}
+```
+
+---
+
+### `cordango_get`
+
+Retrieve a specific resource by type and ID.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `resource_type` | `string` | ✅ | The type of resource (e.g., `user`, `workflow`, `report`). |
+| `resource_id` | `string` | ✅ | The unique identifier of the resource. |
+
+---
+
+## Tool Errors
+
+All tools return a standard error envelope when something goes wrong:
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "The requested resource could not be found."
+  }
+}
+```
+
+Common error codes:
+
+| Code | Meaning |
+|------|---------|
+| `UNAUTHORIZED` | Invalid or missing API key. |
+| `NOT_FOUND` | Resource does not exist. |
+| `RATE_LIMITED` | Too many requests. |
+| `INTERNAL_ERROR` | Something went wrong on Cordango's side. |

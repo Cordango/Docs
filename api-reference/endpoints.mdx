@@ -1,0 +1,116 @@
+---
+title: Endpoints
+description: "Complete reference for all Cordango REST API endpoints."
+---
+
+## Status
+
+### `GET /status`
+
+Returns the current status of the Cordango API.
+
+```bash
+curl https://api.cordango.com/v1/status \
+  -H "Authorization: ******"
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "status": "operational"
+  }
+}
+```
+
+---
+
+## Workspaces
+
+### `GET /workspaces`
+
+List all workspaces accessible to your API key.
+
+```bash
+curl https://api.cordango.com/v1/workspaces \
+  -H "Authorization: ******"
+```
+
+**Response:**
+
+```json
+{
+  "data": [
+    {
+      "id": "ws_abc123",
+      "name": "My Workspace",
+      "created_at": "2026-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### `GET /workspaces/{workspace_id}`
+
+Retrieve a specific workspace.
+
+| Parameter | Location | Description |
+|-----------|----------|-------------|
+| `workspace_id` | Path | The ID of the workspace. |
+
+---
+
+## Workflows
+
+### `GET /workspaces/{workspace_id}/workflows`
+
+List all workflows in a workspace.
+
+### `POST /workspaces/{workspace_id}/workflows/{workflow_id}/execute`
+
+Execute a workflow.
+
+**Request body:**
+
+```json
+{
+  "inputs": {
+    "key": "value"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "data": {
+    "execution_id": "exec_xyz789",
+    "status": "running"
+  }
+}
+```
+
+---
+
+### `GET /executions/{execution_id}`
+
+Retrieve the status and output of a workflow execution.
+
+**Response:**
+
+```json
+{
+  "data": {
+    "execution_id": "exec_xyz789",
+    "status": "completed",
+    "outputs": {
+      "result": "Success"
+    },
+    "completed_at": "2026-08-23T11:05:00Z"
+  }
+}
+```

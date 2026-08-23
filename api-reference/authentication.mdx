@@ -1,0 +1,33 @@
+---
+title: Authentication
+description: "Authenticate your REST API requests."
+---
+
+## API Key Authentication
+
+The Cordango REST API uses API key authentication. Pass your key in the `Authorization` header:
+
+```
+Authorization: ******
+```
+
+<Warning>
+  Keep your API keys secret. Do not commit them to version control. Use environment variables or a secrets manager.
+</Warning>
+
+## Obtaining a Key
+
+1. Log in to the [Cordango Dashboard](https://cordango.com/dashboard).
+2. Go to **Settings → API Keys**.
+3. Click **Create API Key**, name it, and copy the value.
+
+## Example
+
+```bash
+curl https://api.cordango.com/v1/status \
+  -H "Authorization: ******"
+```
+
+## Revoking a Key
+
+Keys can be revoked at any time from the **Settings → API Keys** page in the dashboard. Revoked keys immediately stop working.

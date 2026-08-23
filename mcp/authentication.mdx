@@ -1,0 +1,59 @@
+---
+title: MCP Authentication
+description: "Authenticate requests to the Cordango MCP server."
+---
+
+## Authentication Method
+
+The Cordango MCP server uses **API key authentication**. Include your API key in the `Authorization` header of every request.
+
+```
+Authorization: ******
+```
+
+<Note>
+  Never expose your API key in client-side code or public repositories. Use environment variables or a secrets manager.
+</Note>
+
+## Obtaining an API Key
+
+1. Log in to the [Cordango Dashboard](https://cordango.com/dashboard).
+2. Navigate to **Settings → API Keys**.
+3. Click **Create API Key**, give it a descriptive name, and copy the generated key.
+
+## Configuring Your MCP Client
+
+### Claude (via MCP config file)
+
+```json
+{
+  "mcpServers": {
+    "cordango": {
+      "url": "https://mcp.cordango.com/v1",
+      "headers": {
+        "Authorization": "******"
+      }
+    }
+  }
+}
+```
+
+### Environment Variable (recommended)
+
+Store your key as an environment variable and reference it:
+
+```bash
+export CORDANGO_API_KEY="your-api-key-here"
+```
+
+Then configure your MCP client to read from `CORDANGO_API_KEY`.
+
+## Key Scopes
+
+When creating an API key you can restrict its permissions:
+
+| Scope | Description |
+|-------|-------------|
+| `mcp:read` | Query data via MCP tools. |
+| `mcp:write` | Execute workflows and write data via MCP tools. |
+| `api:full` | Full REST API access. |

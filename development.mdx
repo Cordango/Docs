@@ -1,0 +1,37 @@
+---
+title: Local Development
+description: "Preview your documentation changes locally using the Mintlify CLI."
+---
+
+## Install the Mintlify CLI
+
+You can preview your documentation changes locally before publishing by using the Mintlify CLI.
+
+```bash
+npm i -g mintlify
+```
+
+## Start the Development Server
+
+Run the following command at the root of your documentation repository (where `mint.json` is located):
+
+```bash
+mintlify dev
+```
+
+The Mintlify CLI will start a local server. Open [http://localhost:3000](http://localhost:3000) in your browser to preview the docs.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The CLI is not loading my changes">
+    Mintlify uses hot-reloading. If your changes are not appearing, try stopping the server (`Ctrl+C`) and running `mintlify dev` again.
+  </Accordion>
+  <Accordion title="Port 3000 is already in use">
+    You can specify a custom port with `mintlify dev --port 3333`.
+  </Accordion>
+</AccordionGroup>
+
+## Publishing
+
+Push your changes to the repository connected to your Mintlify project and they will be deployed automatically.

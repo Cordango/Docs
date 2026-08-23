@@ -1,0 +1,39 @@
+---
+title: MCP Overview
+description: "Understand how the Cordango Model Context Protocol (MCP) works."
+---
+
+## What Is the Cordango MCP?
+
+The Cordango MCP (Model Context Protocol) is a standardised interface that allows AI models and agents to interact with Cordango's platform capabilities — including data retrieval, workflow execution, and external integrations — through a consistent, tool-based API.
+
+## How It Works
+
+```
+AI Model  →  MCP Client  →  Cordango MCP Server  →  Cordango Platform
+```
+
+1. Your AI model sends a tool-call request via an MCP-compatible client.
+2. The Cordango MCP Server validates the request and your credentials.
+3. The server executes the requested tool and returns a structured result.
+4. Your AI model receives the result and continues its reasoning.
+
+## Supported MCP Clients
+
+| Client | Status |
+|--------|--------|
+| Claude (Anthropic) | ✅ Supported |
+| OpenAI Assistants | ✅ Supported |
+| LangChain | ✅ Supported |
+| Custom clients | ✅ Supported (via MCP spec) |
+
+## Server Endpoint
+
+```
+https://mcp.cordango.com/v1
+```
+
+## Next Steps
+
+- [Available Tools](/mcp/tools) — See what tools are exposed by the Cordango MCP.
+- [Authentication](/mcp/authentication) — Learn how to authenticate MCP requests.

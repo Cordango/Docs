@@ -1,0 +1,56 @@
+---
+title: API Reference
+description: "Overview of the Cordango REST API."
+---
+
+## Base URL
+
+All REST API requests are made to:
+
+```
+https://api.cordango.com/v1
+```
+
+## Request Format
+
+- All requests must include an `Authorization` header with your API key.
+- Request bodies should be JSON with `Content-Type: application/json`.
+- All responses are returned as JSON.
+
+## Response Format
+
+Successful responses follow this structure:
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "request_id": "req_abc123",
+    "timestamp": "2026-08-23T11:00:00Z"
+  }
+}
+```
+
+Error responses follow this structure:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "The `workspace_id` field is required.",
+    "details": []
+  }
+}
+```
+
+## Rate Limiting
+
+The API enforces rate limits per API key:
+
+| Plan | Requests per minute |
+|------|---------------------|
+| Free | 60 |
+| Pro | 600 |
+| Enterprise | Unlimited |
+
+When you exceed your rate limit, the API returns `429 Too Many Requests` with a `Retry-After` header.

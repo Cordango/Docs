@@ -1,0 +1,57 @@
+---
+title: Quickstart
+description: "Get up and running with Cordango in under 5 minutes."
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A Cordango account — [sign up here](https://cordango.com)
+- An API key from the [Cordango Dashboard](https://cordango.com/dashboard)
+
+## 1. Obtain Your API Key
+
+Log in to the [Cordango Dashboard](https://cordango.com/dashboard) and navigate to **Settings → API Keys**. Create a new key and copy it — you'll need it in the next step.
+
+## 2. Make Your First API Call
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://api.cordango.com/v1/status \
+  -H "Authorization: ******"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://api.cordango.com/v1/status",
+    headers={"Authorization": "******"},
+)
+print(response.json())
+```
+
+```javascript JavaScript
+const response = await fetch("https://api.cordango.com/v1/status", {
+  headers: { Authorization: "******" },
+});
+const data = await response.json();
+console.log(data);
+```
+</CodeGroup>
+
+## 3. Connect to the MCP
+
+Follow the [MCP Overview](/mcp/overview) guide to connect your AI models to Cordango's Model Context Protocol.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="MCP Tools" icon="wrench" href="/mcp/tools">
+    Discover all available MCP tools.
+  </Card>
+  <Card title="API Reference" icon="code" href="/api-reference/introduction">
+    Explore the full REST API.
+  </Card>
+</CardGroup>
