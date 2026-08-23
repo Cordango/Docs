@@ -1,0 +1,138 @@
+---
+title: The App Definition
+description: "The JSON document your source compiles into."
+---
+
+The App Definition is one JSON document that fully describes an application. It is the contract
+everything downstream consumes: the runtime, the UI renderer, the standalone generator and the
+publish pipeline all read this and nothing else.
+
+You do not write it. You write [semantic source](/concepts/semantic-source), and the compiler
+produces this.
+
+## Why there are two formats
+
+They are not competing spellings of the same thing. They answer to different readers.
+
+| | Semantic source | App Definition |
+| --- | --- | --- |
+| Format | YAML, many files | JSON, one document |
+| Written by | You, or an agent | The compiler |
+| Organised by | One aggregate per file | One document, whole app |
+| Collections keyed by | Maps, keyed by identifier | Arrays, with an explicit `key` |
+| Read by | People, in diffs | Machines |
+| In git | Yes | No, it is build output |
+
+A real app makes the difference concrete. The Budget Planner corpus app is 98 source files totalling
+about 133 KB, and it compiles to a single 225 KB JSON document.
+
+The size is not the point. Ninety-eight files that each describe one thing can be reviewed one at a
+time; one 225 KB document cannot.
+
+## The same entity, both ways
+
+<CodeGroup>
+```yaml Semantic source
+entity: team
+label: Team
+fields:
+  name:
+    type: text
+    label: Team Name
+    required: true
+```
+
+```json App Definition
+{
+  "key": "team",
+  "label": "Team",
+  "fields": [
+    {
+      "key": "name",
+      "type": "text",
+      "label": "Team Name",
+      "required": true
+    }
+  ]
+}
+```
+</CodeGroup>
+
+In source, `fields` is a map and the field key is the map key. In the App Definition, `fields` is an
+array and every item carries its own `key`. Maps read better and cannot contain a duplicate key;
+arrays preserve order and are what a schema validator and a code generator want.
+
+## The envelope
+
+Five things are required at the top level: `schemaVersion`, `key`, `name`, `version` and
+`entities`. An app with no entities is not an app.
+
+```json
+{
+  "schemaVersion": "2.0",
+  "key": "budget_planner",
+  "name": "Budget Planner",
+  "version": "16.3.0",
+  "entities": [ … ]
+}
+```
+
+Everything else is optional, and each optional block is a concern the app may or may not have:
+
+<ResponseField name="entities, relations" type="the data model">
+  What the app stores and how records point at each other.
+</ResponseField>
+
+<ResponseField name="views, pages, presentation, theme" type="the interface">
+  Block trees, the screens they compose into, and how the app looks.
+</ResponseField>
+
+<ResponseField name="processes, commands, workflows" type="behaviour">
+  Lifecycles, the actions that move between states, and what happens automatically.
+</ResponseField>
+
+<ResponseField name="roles" type="access">
+  Who may read and write what.
+</ResponseField>
+
+<ResponseField name="archetype, plugins, description" type="metadata">
+  What kind of application this is, and what it is for.
+</ResponseField>
+
+## Where you will meet it
+
+Mostly you will not. Three places you might:
+
+**`cordango build`** writes it under `.cordango/build/<key>/`. Deterministic: the same source
+produces the same bytes.
+
+**`cordango import`** goes the other way. Hand it an existing App Definition and it produces source
+files you can edit.
+
+```bash
+cordango import ./app.definition.json --app support
+```
+
+**`cordango publish`** sends one to an instance. It builds from source rather than from
+`.cordango/`, because a build artifact is a cache and a cache is not an authority.
+
+<Warning>
+`.cordango/` is build output. Editing the compiled App Definition there is not a way to change your
+app; the next build overwrites it. Change the source.
+</Warning>
+
+## Comparing definitions
+
+Two App Definitions with identical meaning can differ byte for byte, because storing one as `jsonb`
+reorders its keys. Compare them by their definition hash rather than by their text.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="The schema" icon="file-code" href="/concepts/schema">
+    The formal contract, how it is composed, and how to validate against it.
+  </Card>
+  <Card title="Targets" icon="wand-magic-sparkles" href="/concepts/targets">
+    What turns an App Definition into a running application.
+  </Card>
+</CardGroup>

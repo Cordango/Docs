@@ -1,0 +1,43 @@
+---
+title: Install
+description: "Install the cordango CLI."
+---
+
+The CLI is one self-contained binary of about 39 MB that carries its own runtime. It does not need
+.NET installed, not the SDK, not the runtime, not ICU. Uninstalling is deleting the file.
+
+<CodeGroup>
+```bash macOS and Linux
+curl -fsSL https://cordango.com/install.sh | sh
+```
+
+```bash Homebrew
+brew install cordango/tap/cordango
+```
+
+```powershell Windows (Scoop)
+scoop bucket add cordango https://github.com/cordango/scoop-bucket
+scoop install cordango
+```
+</CodeGroup>
+
+## Check the install
+
+```bash
+cordango version
+```
+
+That prints the CLI version, the source-format version and the App Definition schema version. A
+generated application pins its runtime to the version of the generator that wrote its project file,
+so these numbers matter when you come back to a project later.
+
+## The runtime package
+
+<ResponseField name="Cordango.Standalone" type="library">
+  The runtime a generated application runs on: records, hooks, permissions, queries, the built-in
+  directory and the error wire.
+</ResponseField>
+
+You do not install this one. A generated application emits it as source, so what comes out of
+`cordango build` has no dependency on a feed. `--runtime package` references it from NuGet instead,
+pinned to the version of the generator that wrote the project file.

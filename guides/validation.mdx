@@ -1,0 +1,90 @@
+---
+title: Validating and CI
+description: "cordango check, and what to run on every commit."
+---
+
+```bash
+cordango check
+cordango check --app support
+cordango check --json
+```
+
+Parse, lower, validate. No model, no database, no network, no account. It is free, and it is meant
+to be run constantly.
+
+## Three outcomes, not two
+
+<ResponseField name="not coherent" type="error">
+  The app does not hold together: a reference points at nothing, a lifecycle names a state that
+  does not exist, a screen is bound to a field that was removed. Fix it.
+</ResponseField>
+
+<ResponseField name="coherent, incomplete" type="not an error">
+  It holds together but is not a finished application yet. No screen to land on, nothing to create.
+  This is the normal state mid-build, and treating it as a failure would make "look at it running"
+  the one thing you cannot do while building.
+</ResponseField>
+
+<ResponseField name="coherent, complete" type="done">
+  It holds together and it is a whole application.
+</ResponseField>
+
+Only the first is a failure. A CI job that fails on the second will fail on every honest work in
+progress, which teaches everyone to ignore it.
+
+## Asking about a target
+
+```bash
+cordango check --app support --target dotnet-vue
+```
+
+A separate question from validity. This asks whether that specific generator can build this app,
+and lists anything it cannot. See [Targets](/concepts/targets).
+
+## In CI
+
+The whole check runs offline from a clone, with no services and no secrets.
+
+```yaml
+name: cordango
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cordango
+        run: curl -fsSL https://cordango.com/install.sh | sh
+      - name: Check
+        run: cordango check --json
+      - name: Formatting is canonical
+        run: |
+          cordango fmt
+          git diff --exit-code
+```
+
+That second step is worth having. `cordango fmt` is deterministic, so a non-empty diff after
+running it means someone hand-edited and did not format, and every subsequent diff in that file
+will be noisier than it needs to be.
+
+## Checking the workspace rather than the apps
+
+```bash
+cordango doctor
+```
+
+Problems that are not source errors: an app registered in `cordango.yaml` whose directory is gone,
+a credential pointing at an instance that no longer exists. `check` is about an app. `doctor` is
+about the workspace around it.
+
+## Before publishing
+
+`cordango publish` runs the same pipeline itself, and it will not send a workspace that does not
+hold together. It also checks **every** selected app before sending **any** of them, because
+publishing three apps and failing on the fourth would leave an instance holding half a workspace
+whose cross-app references no longer resolve.
+
+So you do not have to check first. It is still worth checking first, because a failure at your
+terminal is cheaper than a failure halfway through a deploy.

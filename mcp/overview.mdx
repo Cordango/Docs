@@ -1,0 +1,59 @@
+---
+title: Overview
+description: "Where MCP fits, and what exists today."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+<Warning>
+**Not built yet.** There is no Cordango MCP server to connect to. This page records the intended
+design so the shape is not invented twice. Nothing here is a stable contract, and no tool names on
+this page should be relied on.
+</Warning>
+
+## The intent
+
+An app is meant to have three faces over one security, entitlement and audit layer:
+
+<CardGroup cols={3}>
+  <Card title="UI" icon="window">
+    The rendered application people use.
+  </Card>
+  <Card title="REST" icon="code">
+    Baseline on every app. See the [API reference](/api-reference/introduction).
+  </Card>
+  <Card title="MCP" icon="plug">
+    The same operations, addressed by an AI client.
+  </Card>
+</CardGroup>
+
+The point of the split is that MCP is not a separate integration with its own permission model. It
+projects the operations that already exist, through the same checks the REST facade goes through,
+so an AI client acting as you can reach exactly what you can reach.
+
+## What exists today
+
+The REST facade is real and documented. It is generated from the app's manifest, and each app
+publishes its own OpenAPI document:
+
+```
+GET /api/app/{handle}/openapi.json
+```
+
+Until there is an MCP server, that document is the practical route for an AI client: point a tool
+generator at it and you get the app's real entities and fields rather than a generic shape.
+
+## Open questions
+
+These are undecided rather than merely undocumented:
+
+- Transport specifics, streamable HTTP and resumability.
+- Whether a per-app server, a workspace-level aggregator gateway, or both.
+- Tier gating. MCP is planned as a paid-tier feature.
+
+<Note>
+When the server lands, this section gets a real tool reference. Until then, treat anything claiming
+to document Cordango MCP tools as fiction.
+</Note>

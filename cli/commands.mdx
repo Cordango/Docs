@@ -1,0 +1,82 @@
+---
+title: Command reference
+description: "Every cordango command in this build."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Everything in the first table works with no instance, no account and no network. That split is
+worth seeing at a glance, so the CLI's own help prints it the same way.
+
+Every command accepts `--json`.
+
+## Offline
+
+| Command | What it does |
+| --- | --- |
+| `cordango new <first-app>` | Create a workspace and its first app. Needs an empty directory. |
+| `cordango add app <name>` | Add another app to this workspace. One workspace holds many. |
+| `cordango import <app.definition.json> [--app <name>]` | Bring an existing App Definition in as source files you can edit. |
+| `cordango check [--app <key>] [--target <id>]` | Parse, lower and validate. No model, no database. With `--target`, also ask whether that generator can build it. |
+| `cordango validate [--app <key>] [--target <id>]` | The same command; the word for asking about a target. |
+| `cordango targets` | What this build can generate, and what each target deliberately will not. |
+| `cordango build [--app <key>]` | Write `.cordango/build/<key>/` artifacts. Deterministic. |
+| `cordango build --app <key> --target <id> --out <dir>` | Generate a whole application into a directory you own. |
+| `cordango inspect [path] [--app <key>]` | Describe the workspace, one app, or one aggregate. |
+| `cordango vocabulary [<name>]` | What may be written: Cord's words, or one construct's schema. |
+| `cordango apply <ops.json> --app <key> --scope <kind[:key]>` | Apply semantic operations and rewrite the affected source files. |
+| `cordango fmt [--app <key>]` | Rewrite every `.cordango.yaml` file in canonical form. |
+| `cordango doctor` | Check the workspace for problems that are not source errors. |
+| `cordango version` | CLI, source-format and App Definition schema versions. |
+
+<PlatformBeta />
+
+## Connected to an instance
+
+| Command | What it does |
+| --- | --- |
+| `cordango login <token> [--instance <url>]` | Connect to a Cordango instance. Make a token under your avatar, Personal Access Keys. |
+| `cordango whoami [--offline]` | Which instance this workspace publishes to, and as whom. |
+| `cordango publish [--app <key>] [--force]` | Build from source, send it to the instance, and make it live. |
+| `cordango logout [--instance <url>] [--all]` | Forget a stored credential on this machine. Does not revoke it. |
+
+See [Publishing](/cli/publish) for what those four do in practice.
+
+## build
+
+`cordango build` on its own writes deterministic build artifacts under `.cordango/build/<key>/`.
+Given the same source it writes the same bytes.
+
+With a target and an output directory it generates a complete application instead:
+
+```bash
+cordango build --app support --target dotnet-vue --out ./out
+```
+
+<ParamField path="--seed" type="number">
+  Generate a different demo dataset.
+</ParamField>
+
+<ParamField path="--allow-incomplete" type="flag">
+  Accept a build the generator cannot finish, and report what was left out. Without it, missing
+  behaviour refuses the build.
+</ParamField>
+
+<ParamField path="--runtime package" type="flag">
+  Reference `Cordango.Standalone` from a feed instead of checking its source into the generated
+  project. The default emits the runtime as source, so what you generate has no dependency on us.
+</ParamField>
+
+## check
+
+```bash
+cordango check
+cordango check --app support
+cordango check --app support --target dotnet-vue
+```
+
+No model, no database, no network. This is the command for a pre-commit hook and for CI, and it
+works from a clone of the open source repository with nothing else installed.
+
+`cordango validate` is the same command. Use whichever word fits the sentence you are writing.

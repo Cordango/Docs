@@ -1,0 +1,95 @@
+---
+title: Building with an agent
+description: "Cordango is designed to be driven by an AI coding agent."
+---
+
+An App Definition is a document with a published schema and an offline checker. That makes it an
+unusually good target for an AI agent: it can write, check its own work, and be told precisely what
+it got wrong, all without a database, a model API or a deploy.
+
+This section has a tuned starting prompt for each of the common agents. They differ, because the
+tools differ. Read this page first, because the reasoning behind all of them is the same.
+
+## Your workspace already briefs the agent
+
+```bash
+cordango new support
+```
+
+That writes `CLAUDE.md` and `AGENTS.md` into the workspace root, with the same generated text in
+both. Two conventions want two filenames, and a workspace that taught two agents different rules
+would produce source only one of them could maintain.
+
+<Note>
+This is the single most important thing on the page. The instructions are already there. Your
+prompt does not need to re-explain Cordango, and it should not try.
+</Note>
+
+What those files teach is the **workflow**, not the vocabulary: how to find out, rather than a copy
+of the schema. That is deliberate, and it is what stops an agent's context filling up with 212 KB of
+JSON Schema.
+
+## The rules they install
+
+Every prompt in this section leans on these, so they are worth reading once.
+
+**Discover, do not guess.** `cordango inspect` for what exists, `cordango vocabulary` for what may
+be written. Both answer from the installed build, so they cannot drift from what the CLI will
+accept.
+
+**Never read the schema, never read the binary.** If `cordango vocabulary` cannot answer a
+question, that is a gap worth reporting rather than working around.
+
+**Check constantly.** `cordango check` calls no model and touches no database. It is free. Run it
+after every change.
+
+**One aggregate per change.** It keeps diffs reviewable, and it is what `--scope` enforces.
+
+**Stable keys.** Renaming an entity or field key is not supported, because nothing rewrites the
+references to it. Add and remove deliberately instead.
+
+**The agent does not accept its own work.** `cordango apply` writes to the working tree. A person
+reads `git diff` and stages it.
+
+## Every command speaks JSON
+
+```bash
+cordango help --json
+cordango inspect --app support --json
+cordango check --json
+```
+
+`--json` works on all of them. `cordango help --json` in particular is how an agent discovers the
+command surface without a human pasting a README into its context.
+
+## The shape of a good prompt
+
+Short, and about the job. The workspace supplies the rest.
+
+```text
+Add a "priority" field to the ticket entity: a select with low, normal, high and urgent,
+defaulting to normal. Then show it as a column on the tickets table.
+
+Run cordango check when you are done. Do not commit.
+```
+
+Note what is absent. No explanation of what Cordango is, no YAML example, no schema excerpt, no list
+of field types. All of that is one `cordango vocabulary field` away, and an agent that looks it up
+gets the version that matches the installed CLI.
+
+## Pick your agent
+
+<CardGroup cols={2}>
+  <Card title="Claude Code" icon="terminal" href="/ai/claude">
+    Reads `CLAUDE.md` automatically. The path of least resistance.
+  </Card>
+  <Card title="Codex" icon="code" href="/ai/codex">
+    Reads `AGENTS.md`. Same workspace, same instructions.
+  </Card>
+  <Card title="Cursor" icon="arrow-pointer" href="/ai/cursor">
+    Needs a rules file pointing at the workspace instructions.
+  </Card>
+  <Card title="GLM" icon="robot" href="/ai/glm">
+    Strongest with explicit, sequenced instructions.
+  </Card>
+</CardGroup>

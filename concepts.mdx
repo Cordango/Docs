@@ -1,0 +1,104 @@
+---
+title: Overview
+description: "How the pieces fit together."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Cordango has one idea in the middle of it: an application is a **document**, not a codebase. You
+describe what the application is, and something else works out what it has to be to run.
+
+```
+Human or AI
+     |
+Cordango source              .cordango.yaml, one aggregate per file
+     |
+  compiler
+     |
+App Definition               the canonical contract, one JSON document
+     |
+     +----------------------+
+     |                      |
+Cordango Platform     Standalone generator
+                            |
+                     complete source project
+                            |
+                      deploy anywhere
+```
+
+Everything above the App Definition is open source and runs offline. `cordango check` needs no
+model, no database, no account and no network.
+
+<PlatformBeta />
+
+## The four things worth understanding
+
+<CardGroup cols={2}>
+  <Card title="Semantic source" icon="file-code" href="/concepts/semantic-source">
+    The `.cordango.yaml` files you write. One aggregate per file: an entity, a lifecycle, a role, a
+    screen.
+  </Card>
+  <Card title="The App Definition" icon="brackets-curly" href="/concepts/app-definition">
+    The single JSON document your source compiles into. The contract everything downstream reads.
+  </Card>
+  <Card title="The schema" icon="shield-check" href="/concepts/schema">
+    The formal gate. Why you should ask `cordango vocabulary` instead of reading it.
+  </Card>
+  <Card title="Targets" icon="wand-magic-sparkles" href="/concepts/targets">
+    What turns a definition into a running application, and how each one declares its limits.
+  </Card>
+</CardGroup>
+
+## Workspaces and apps
+
+A workspace holds many apps. That is deliberate: a company system is several applications that
+reference each other, not one application with everything in it.
+
+<CodeGroup>
+```bash Create the workspace
+mkdir acme && cd acme
+cordango new support
+```
+
+```bash Add the next app
+cordango add app billing
+```
+</CodeGroup>
+
+Apps in one workspace can reference each other's records, and they can reference
+[core apps](/concepts/core-apps) that the platform provides to every workspace.
+
+## Aggregates and scope
+
+An **aggregate** is one addressable thing: an entity, a lifecycle, an action, an automation, a role,
+a screen. It is the unit a file holds, the unit a change is scoped to, and the unit `cordango
+inspect` describes.
+
+```bash
+cordango inspect                                # the workspace
+cordango inspect --app support                  # one app
+cordango inspect entities/ticket --app support  # one aggregate
+```
+
+The aggregate kinds are `identity`, `domain`, `behaviour`, `access`, `screen` and `tab`. They matter
+when you change an app through [semantic operations](/guides/semantic-ops), where `--scope` names
+the one aggregate a change may touch.
+
+## Coherent, complete, valid
+
+Three different words that get used interchangeably elsewhere and mean distinct things here.
+
+<ResponseField name="not coherent" type="error">
+  The app does not hold together. A reference points at nothing, a lifecycle names a state that
+  does not exist. Fix it.
+</ResponseField>
+
+<ResponseField name="coherent, incomplete" type="normal">
+  It holds together but is not a finished application: no screen to land on, nothing to create.
+  This is the usual state mid-build. It publishes, with reasons printed.
+</ResponseField>
+
+<ResponseField name="valid for a target" type="a separate question">
+  Whether one specific generator can build it. Ask with `cordango check --target <id>`.
+</ResponseField>

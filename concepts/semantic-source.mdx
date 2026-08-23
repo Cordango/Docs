@@ -1,0 +1,228 @@
+---
+title: Semantic source
+description: "The .cordango.yaml files you actually write."
+---
+
+Semantic source is what you author. One aggregate per file, one file per thing: an entity, a
+lifecycle, an action, an automation, a role, a screen.
+
+The point is not that YAML is nicer than JSON. It is that **one thing lives in one file**. An
+entity you can open, read in full and review in a diff is a different object from the same entity
+buried three thousand lines into a single document.
+
+## The shape of a file
+
+Every file opens by declaring what it is. The first key is the aggregate kind, and its value is the
+key of that aggregate.
+
+<CodeGroup>
+```yaml entities/team.cordango.yaml
+entity: team
+```
+
+```yaml roles/viewer.cordango.yaml
+role: viewer
+```
+
+```yaml workflows/lifecycles/funding_lifecycle.cordango.yaml
+lifecycle: funding_lifecycle
+```
+
+```yaml workflows/automations/stamp_owner.cordango.yaml
+automation: stamp_owner
+```
+
+```yaml views/screens/costs.cordango.yaml
+screen: costs
+```
+</CodeGroup>
+
+That first line is how the compiler knows what it is reading. The directory is for humans.
+
+## An entity
+
+```yaml
+entity: team
+kind: config
+label: Team
+plural: Teams
+icon: account-group
+display: name
+description: A functional team hiring is grouped by.
+fields:
+  name:
+    type: text
+    label: Team Name
+    required: true
+    unique: true
+  function:
+    type: select
+    label: Function
+    required: true
+    options:
+      - value: engineering
+        label: Engineering
+        color: "#0f766e"
+      - value: sales
+        label: Sales
+        color: "#f59e0b"
+  default_salary:
+    type: money
+    label: Default Gross Salary / Year
+    currency: EUR
+    help: Prefilled onto new hiring lines.
+  description:
+    type: longtext
+    label: Description
+```
+
+`fields` is a **map keyed by field key**. The key is the identifier the rest of the app refers to;
+everything under it describes what that field is.
+
+<Note>
+`kind` says what sort of thing the entity is: `collection` for records people create all day,
+`config` for a small reference list, `settings` for a single row of app-wide values. It changes how
+the app presents the entity, not how it stores it.
+</Note>
+
+### Field types
+
+`text`, `longtext`, `integer`, `decimal`, `money`, `boolean`, `date`, `datetime`, `email`, `url`,
+`phone`, `select`, `multiselect`, `reference`, `json`, `attachment`.
+
+A field says what it *is*. Type-specific keys follow from that: `options` on a `select`, `currency`
+on `money`, `precision` and `scale` on `decimal`, `targetEntity` on a `reference`.
+
+```bash
+cordango vocabulary field
+```
+
+That prints every property a field accepts and every type it can be, from the build you have
+installed. It is the authoritative answer, and it is shorter than this page.
+
+## A role
+
+Roles are grants, entity by entity.
+
+```yaml
+role: viewer
+name: Investor / Viewer
+description: Read-only access to the plan, for investors and advisors.
+grants:
+  scenario:
+    read: true
+  period:
+    read: true
+  hiring_line:
+    read: true
+```
+
+There is no inheritance and no wildcard. An entity you did not name is an entity this role cannot
+touch, which means reading the file tells you what the role can do without having to hold the rest
+of the app in your head.
+
+## A lifecycle
+
+States and the transitions between them, over one field of one entity.
+
+```yaml
+lifecycle: funding_lifecycle
+entity: funding_round
+stateField: round_stage
+initial: planned
+states:
+  planned:
+    label: Planned
+    phase: not_started
+    color: "#94a3b8"
+  in_conversation:
+    label: In Conversation
+    phase: active
+    color: "#38bdf8"
+  abandoned:
+    label: Not Happening
+    phase: cancelled
+    terminal: true
+transitions:
+  start_raise:
+    label: Start Raising
+    from: [planned]
+    to: in_conversation
+    action:
+      icon: rocket-launch
+      style: primary
+```
+
+`phase` is the generic reading of a state, so a board or a chart can group states it has never seen
+before. `terminal` says nothing leaves this state.
+
+## An automation
+
+Trigger, entity, effects.
+
+```yaml
+automation: stamp_scenario_owner
+name: Stamp scenario owner on creation
+trigger: record.created
+entity: scenario
+effects:
+  - type: updateRecord
+    setIfEmpty: true
+    set:
+      owner: "{{actor.id}}"
+```
+
+## The app file
+
+One per app, holding what is not owned by any single aggregate: identity, theme, relations between
+entities, and the order things appear in.
+
+```yaml
+app: budget_planner
+name: Budget Planner
+version: 16.3.0
+schemaVersion: "2.0"
+description: Build and maintain an investor-ready financial budget plan.
+theme:
+  primaryColor: "#0f766e"
+  radius: small
+  density: compact
+relations:
+  scenario_periods:
+    type: oneToMany
+    label: Periods
+    fromEntity: scenario
+    toEntity: period
+    inverseField: scenario
+```
+
+## Two halves of a workspace
+
+This is worth knowing, because it changes how much vocabulary you need.
+
+<CardGroup cols={2}>
+  <Card title="Semantic" icon="circle-check">
+    `entities/`, `workflows/`, `roles/`. A small vocabulary, all of it listed by
+    `cordango vocabulary` with no arguments. You will rarely need more.
+  </Card>
+  <Card title="Block trees" icon="circle-half-stroke">
+    `views/`. Screens are not modelled semantically yet, so these are still App Definition block
+    trees. This is where `cordango vocabulary block <kind>` earns its place.
+  </Card>
+</CardGroup>
+
+Ask for one block kind at a time. Asking for everything defeats the point of the layer.
+
+## Formatting
+
+```bash
+cordango fmt
+```
+
+Rewrites every `.cordango.yaml` file in canonical form: consistent key order, consistent quoting.
+Run it after hand-editing so a diff shows a change in meaning rather than a change in whitespace.
+
+## What is not source
+
+`.cordango/`, with the leading dot, is build output. It is regenerated and it is not committed.
+Editing it does nothing that survives the next `cordango build`.

@@ -1,0 +1,103 @@
+---
+title: GLM
+description: "Starting prompt and setup for GLM models."
+---
+
+GLM models are reached through an Anthropic-compatible endpoint, so they run inside Claude Code
+against the same `CLAUDE.md` a Cordango workspace already ships.
+
+## Point Claude Code at GLM
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.z.ai/api/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "your-z-ai-api-key",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "glm-5.2",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-5.2",
+    "API_TIMEOUT_MS": "3000000"
+  }
+}
+```
+
+Put that in `~/.claude/settings.json` for every project, or in `.claude/settings.json` for this
+workspace only. Get a key from [z.ai](https://z.ai/manage-apikey/apikey-list).
+
+The long timeout is not decoration. A whole-app generation pass is a long single call, and the
+default will cut it off partway.
+
+Everything on the [Claude Code page](/ai/claude) applies from here: the same `CLAUDE.md`, the same
+permission allowlist, the same slash commands.
+
+## Write the sequence out
+
+This is the one real difference in how you prompt. GLM follows an explicit, numbered plan closely
+and reliably. Left to infer the shape of the work, it tends to do more at once than you want, and a
+change spanning six aggregates is a change nobody can review.
+
+Say the steps.
+
+```text
+Add a "priority" field to the ticket entity.
+
+Steps, in this order. Do not skip ahead.
+
+1. Run `cordango vocabulary field` and confirm what a select field accepts.
+2. Run `cordango inspect entities/ticket --app support` and show me the current entity.
+3. Add the field: select, options low / normal / high / urgent, default normal, label "Priority".
+   Change nothing else in that file.
+4. Run `cordango check --app support`. If it fails, fix it and run it again.
+5. Show me `git diff`.
+
+Stop there. Do not commit. Do not touch the screens yet.
+```
+
+Then ask for the screen change as its own turn.
+
+## Starting from nothing
+
+```text
+Build a support desk app in this workspace.
+
+The job: a small team receives customer problems, works them, and needs to see what is overdue.
+Tickets belong to a customer company, have an owner, move through new / in progress / waiting on
+customer / resolved, and carry a priority.
+
+Work through these phases and stop at the end of each one for my confirmation.
+
+Phase 1. Run `cordango inspect`. List the core apps this workspace already has and their entity
+keys. Tell me which of the things above already exist as core records. Write nothing.
+
+Phase 2. Propose the entity list. For each: its key, its kind (collection, config or settings),
+and its fields. Anything a core app already provides must be a reference, not a new entity.
+Write nothing.
+
+Phase 3. Create the entities, one file at a time, running `cordango check --app support` after
+each one.
+
+Phase 4. Add the lifecycle over the ticket status field.
+
+Phase 5. Add roles.
+
+Phase 6. Add screens.
+
+Rules for all phases: never read the App Definition schema, use `cordango vocabulary` instead.
+Never edit `.cordango/`. Do not commit.
+```
+
+## What to watch for
+
+**Check that it actually ran check.** Ask for the output rather than a summary of it. `cordango
+check` is free, so there is no reason for a step to be reported rather than run.
+
+**Watch for a second copy of a core entity.** The Phase 1 stop exists for this. A `company` or
+`customer` entity appearing in Phase 2 means Phase 1 was skimmed, and it is the one mistake that is
+genuinely awkward to unwind later.
+
+**Keep the scope narrow.** If a turn produced a diff touching more aggregates than you asked for,
+revert it and re-ask with the sequence written out. That is cheaper than reviewing it.
+
+<Note>
+None of this is specific to GLM being worse. Explicit sequencing produces tighter diffs from every
+model on this list. GLM is just the one where the difference is most obvious.
+</Note>

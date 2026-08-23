@@ -1,0 +1,85 @@
+---
+title: Codex
+description: "Starting prompt and setup for Codex."
+---
+
+Codex reads `AGENTS.md` from the project, and `cordango new` writes one with the same content as
+`CLAUDE.md`. There is nothing to configure.
+
+<Steps>
+  <Step title="Create the workspace">
+    ```bash
+    mkdir acme && cd acme
+    cordango new support
+    ```
+  </Step>
+  <Step title="Start Codex in it">
+    ```bash
+    codex
+    ```
+  </Step>
+</Steps>
+
+## Sandbox settings
+
+A Cordango workspace is a good fit for `workspace-write`. The whole authoring loop writes only
+inside the workspace, and the parts that reach the network are the four connected commands, which
+you will want to approve anyway.
+
+```toml
+# .codex/config.toml
+sandbox_mode = "workspace-write"
+approval_policy = "on-request"
+```
+
+That leaves `cordango publish` and `cordango login` asking before they touch an instance, which is
+the right default for a command that changes what a real workspace is running.
+
+## Starting prompt
+
+```text
+Add a "priority" field to the ticket entity: a select with low, normal, high and urgent,
+defaulting to normal. Show it as a column on the tickets table.
+
+Use cordango vocabulary field if you need to check what a select accepts. Run cordango check when
+you are done and show me git diff. Do not commit.
+```
+
+## Starting from nothing
+
+```text
+Build a support desk app in this workspace.
+
+The job: a small team receives customer problems, works them, and needs to see what is overdue.
+Tickets belong to a customer company, have an owner, move through new / in progress / waiting on
+customer / resolved, and carry a priority.
+
+Steps, in order:
+1. Run cordango inspect and tell me which core apps exist. Reference them rather than modelling
+   your own companies or people.
+2. Show me the entity list you intend to create, and wait for me to agree.
+3. Create them one aggregate at a time, running cordango check after each.
+4. Add the lifecycle, then the roles, then the screens.
+5. Finish with cordango check and git diff.
+
+Do not commit.
+```
+
+## Non-interactive runs
+
+`codex exec` runs a prompt without the TUI, which makes the check loop scriptable:
+
+```bash
+codex exec "Run cordango check --json and summarise any errors by file. Do not change anything."
+```
+
+Keep an exec prompt read-only unless you have a reason not to. An agent editing files with nobody
+watching is a fine way to discover that the aggregate you scoped it to was the wrong one.
+
+## Nested instructions
+
+Codex reads `AGENTS.md` from subdirectories as well as the root. That is useful in a workspace with
+several apps: a per-app `apps/support/AGENTS.md` can carry the business rules that only apply to
+that app, while the generated root file keeps carrying the Cordango workflow.
+
+Do not restate the workflow in a nested file. Add to it.

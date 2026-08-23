@@ -1,0 +1,131 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Cordango",
+  "description": "Build complete business applications from a definition you own.",
+  "colors": {
+    "primary": "#1D4ED8",
+    "light": "#3B6BF0",
+    "dark": "#1D4ED8"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo-light.png",
+    "dark": "/logo-dark.png",
+    "href": "https://cordango.com"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get started",
+            "icon": "rocket",
+            "pages": [
+              "index",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Quickstart with an AI agent",
+            "icon": "sparkles",
+            "pages": [
+              "ai/overview",
+              "ai/claude",
+              "ai/codex",
+              "ai/cursor",
+              "ai/glm"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "icon": "diagram-project",
+            "pages": [
+              "concepts",
+              "concepts/semantic-source",
+              "concepts/app-definition",
+              "concepts/schema",
+              "concepts/targets",
+              "concepts/core-apps"
+            ]
+          },
+          {
+            "group": "Guides",
+            "icon": "book-open",
+            "pages": [
+              "guides/authoring",
+              "guides/semantic-ops",
+              "guides/roles",
+              "guides/validation",
+              "guides/deploying"
+            ]
+          },
+          {
+            "group": "Security",
+            "icon": "shield",
+            "pages": [
+              "security"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/install",
+              "cli/commands",
+              "cli/workspace",
+              "cli/publish"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API reference",
+        "groups": [
+          {
+            "group": "API reference",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/authentication",
+              "api-reference/data"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "MCP",
+        "groups": [
+          {
+            "group": "MCP",
+            "pages": [
+              "mcp/overview"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Homepage",
+        "href": "https://cordango.com"
+      },
+      {
+        "label": "GitHub",
+        "href": "https://github.com/cordango/cordango"
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "website": "https://cordango.com",
+      "github": "https://github.com/cordango"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+---
+title: Core apps
+description: "Data the platform already has."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Some records are not yours to model. People, Organizations and Calendar are **core apps** provided
+to every workspace.
+
+They are not in your repository, so you will not find them by reading files.
+
+```bash
+cordango inspect
+```
+
+That lists them along with their entity keys.
+
+## Check before you declare
+
+Before you add an entity, ask whether it already exists. A company, a customer, a supplier, an
+employee, a calendar event: each of these already has a canonical record.
+
+<Warning>
+A second copy of Organizations is the one mistake this layout cannot undo for you later. Everything
+else you can add and remove; two competing sources of truth for who your customers are will outlive
+the decision that created them.
+</Warning>
+
+## Pointing at one
+
+An ordinary reference field with `targetApp` set:
+
+```yaml
+fields:
+  customer:
+    type: reference
+    label: Customer
+    targetApp: core_organizations
+    target: organization
+```
+
+Nothing about this needs an instance, an account or a login. It resolves offline, and
+`cordango check` validates it offline.
+
+## The key is not the label
+
+```bash
+cordango vocabulary core organizations
+```
+
+This gives you the entity key, the label, and every field the core app already carries. They differ
+more often than you would expect: Organizations calls `organization` a "Company".
+
+Look before you point. A reference to a key that does not exist is a `cordango check` error, but a
+reference to the wrong key of the right app is not, and that one you find later.
+
+<PlatformBeta />
+
+## Why they are central
+
+Core apps are what make a workspace a company system rather than a folder of unrelated
+applications. Two apps that both reference `core_organizations` are talking about the same company,
+which is what lets a record in one app mean something in the other.
+
+That resolution is provided by Cordango Platform. A standalone generated application gets its own
+built-in directory instead, emitted as part of its runtime.

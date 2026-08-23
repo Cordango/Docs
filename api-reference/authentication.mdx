@@ -1,0 +1,60 @@
+---
+title: Authentication
+description: "Personal access keys over the Authorization header."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+Requests authenticate with a personal access key presented as a bearer token.
+
+```bash
+curl https://acme.cordango.com/api/app/support/data/ticket \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>"
+```
+
+## Creating a key
+
+On your instance, open your avatar menu and choose **Personal Access Keys**. The secret is shown
+once, at creation.
+
+Keys are managed under `/api/me/access-keys`:
+
+| Method | Path | What it does |
+| --- | --- | --- |
+| `GET` | `/api/me/access-keys` | List your keys. Never the secrets. |
+| `POST` | `/api/me/access-keys` | Mint a key. The secret is in this response and nowhere else. |
+| `DELETE` | `/api/me/access-keys/{id}` | Revoke a key. |
+
+## The token format
+
+A token is a dotted string with a fixed, scannable prefix.
+
+<CodeGroup>
+```text Personal access token
+cord_pat.<keyId>.<secret>
+```
+
+```text Access exchange token
+cord_cxt.<keyId>.<secret>.<encodedAddress>
+```
+</CodeGroup>
+
+The prefix exists so a leaked credential is recognisable to a secret scanner on sight. The key id
+is separate from the secret so a key can be identified in a log or an audit entry without the log
+holding anything usable.
+
+An exchange token additionally encodes the instance address and tenant. That is a convenience for
+`cordango login`, not an authority: the address inside a token is a claim the server confirms. See
+[Publishing](/cli/publish).
+
+## What a key can do
+
+A key acts as you. It carries your relationships and the roles those grant, so it can reach exactly
+what you can reach and nothing else.
+
+<Warning>
+`cordango logout` forgets a credential on the machine it is run on. It does not revoke it. To make
+a key stop working everywhere, delete it on the instance.
+</Warning>

@@ -1,0 +1,91 @@
+---
+title: Publishing
+description: "Connect a workspace to a Cordango instance and make an app live."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+Everything in [Command reference](/cli/commands) above the publish section works offline. These
+four commands are the connected half.
+
+## Get a token
+
+Create a token on your instance under your avatar menu, **Personal Access Keys**.
+
+There are two kinds, and the difference is only how much you have to type.
+
+<ResponseField name="cord_cxt." type="access exchange token">
+  Carries the instance address and tenant inside itself, so the token is the whole command.
+</ResponseField>
+
+<ResponseField name="cord_pat." type="personal access token">
+  Does not carry an address, so it needs `--instance` beside it.
+</ResponseField>
+
+Both mint the same credential and both authenticate identically.
+
+<CodeGroup>
+```bash Exchange token
+cordango login cord_cxt.…
+```
+
+```bash Personal access token
+cordango login cord_pat.… --instance https://acme.cordango.com
+```
+</CodeGroup>
+
+<Warning>
+The token's self-description is checked, never believed. An exchange token says which tenant it
+belongs to; login connects to the named instance, asks the server which tenant it actually belongs
+to, and refuses when the two differ. The address inside a pasted credential is a claim, not
+authority.
+</Warning>
+
+An explicit `--instance` wins over the address inside the token, because somebody typing it has a
+reason: a tunnel, a staging host, a local instance.
+
+## Check where you are pointed
+
+```bash
+cordango whoami
+cordango whoami --offline
+```
+
+Which instance this workspace publishes to, and as whom. `--offline` answers from stored
+credentials without calling the instance.
+
+## Publish
+
+```bash
+cordango publish
+cordango publish --app support
+```
+
+Three things about how this behaves are deliberate.
+
+**It builds from source, never from `.cordango/`.** Publishing the last build artifact would let a
+stale definition reach a real workspace after an edit that was never checked. The artifact is a
+cache, and a cache is not an authority, so publish runs the same pipeline `check` and `build` run
+and sends what that produces.
+
+**Coherent is the bar, not complete.** An app whose domain exists but whose screens do not is a
+normal state mid-authoring. Refusing to publish it would make "look at it running" the one thing you
+cannot do while building. Incomplete apps publish, with the reasons printed. Broken ones do not
+publish at all.
+
+**All or nothing across the workspace.** Every selected app is checked before any of them is sent.
+Publishing three apps and failing on the fourth would leave an instance holding half a workspace
+whose cross-app references no longer resolve.
+
+## Disconnect
+
+```bash
+cordango logout
+cordango logout --instance https://acme.cordango.com
+cordango logout --all
+```
+
+This forgets a stored credential on this machine. It does not revoke it. Revoke a key on the
+instance, under the same Personal Access Keys screen that minted it.

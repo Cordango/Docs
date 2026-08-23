@@ -1,0 +1,60 @@
+---
+title: Cordango
+description: "Build complete business applications from a definition you own."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Cordango is an open application language and a deterministic compiler. You describe what an
+application should do, and Cordango turns that description into a working application.
+
+The description is the artefact that matters. It is called an **App Definition**, and it is the
+same file whether you run the application on the Cordango Platform or generate a standalone
+project and host it yourself.
+
+<Note>
+Cordango is pre-alpha. The language, the CLI and the generated output all still change between
+releases.
+</Note>
+
+## The two products
+
+<CardGroup cols={2}>
+  <Card title="Cordango Open Source" icon="box" href="/cli/install">
+    Builds one application. Its own backend, frontend, database, users, authentication and
+    permissions. Not multi-tenant, no AI at runtime, and no dependency on us once it is generated.
+  </Card>
+  <Card title="Cordango Platform" icon="building" href="/api-reference/introduction">
+    Connects and governs many applications as one company system: shared people and organizations,
+    cross-app references, audit history, AI, search and managed hosting.
+  </Card>
+</CardGroup>
+
+The same App Definition works in both places. What differs is what each target supports, and every
+target says so out loud rather than quietly dropping what it cannot do.
+
+<PlatformBeta />
+
+## Where to start
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Install the CLI and build your first application.
+  </Card>
+  <Card title="Build with an AI agent" icon="sparkles" href="/ai/overview">
+    Tuned starting prompts for Claude Code, Codex, Cursor and GLM.
+  </Card>
+  <Card title="Concepts" icon="diagram-project" href="/concepts">
+    Semantic source, the App Definition, the schema and targets.
+  </Card>
+  <Card title="Guides" icon="book-open" href="/guides/authoring">
+    Editing apps, semantic operations, roles, CI and deployment.
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/cli/commands">
+    Every command, and which ones need an instance.
+  </Card>
+  <Card title="API reference" icon="code" href="/api-reference/introduction">
+    Read and write records in a running app over HTTP.
+  </Card>
+</CardGroup>

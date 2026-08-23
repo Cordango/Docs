@@ -1,0 +1,75 @@
+---
+title: Introduction
+description: "The HTTP surface of a running Cordango app."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+Every app that has been built exposes a generic, manifest-driven REST facade. It is the same
+surface the Cordango frontend uses, so anything the product can do to a record, you can do over
+HTTP.
+
+## Base URL
+
+```
+https://{workspace}.cordango.com/api/app/{handle}
+```
+
+`{handle}` is the app's handle, not its id. A GUID also resolves, so older links keep working, but
+the handle is the address to write down.
+
+There is no single shared `api.cordango.com`. A Cordango instance is your workspace, on your
+subdomain, or on a host you run yourself.
+
+## What is on it
+
+| Method | Path | What it does |
+| --- | --- | --- |
+| `GET` | `/manifest` | The last-built manifest, the compiled shape of the app. |
+| `GET` | `/openapi.json` | An OpenAPI document generated from that manifest. |
+| `GET` | `/data/{entity}` | List records, with paging, sorting and filters. |
+| `GET` | `/data/{entity}/aggregate` | Aggregate server-side, past the list page cap. |
+| `GET` | `/data/{entity}/{recordId}` | One record. |
+| `POST` | `/data/{entity}` | Create a record. |
+| `PUT` | `/data/{entity}/{recordId}` | Replace a record. |
+| `DELETE` | `/data/{entity}/{recordId}` | Delete a record. |
+
+The app must have been built. These routes are driven by the manifest, so without one there is
+nothing to drive them.
+
+<Tip>
+`GET /api/app/{handle}/openapi.json` is generated from your own app's manifest, so it lists your
+entities and your fields rather than a generic shape. Point a client generator at that rather than
+transcribing this page.
+</Tip>
+
+## Errors
+
+Every error carries a stable machine-readable code beside a message rendered in the request's
+language. Branch on `code`, show `error`.
+
+```json
+{
+  "code": "common.forbidden",
+  "error": "You do not have permission to do that."
+}
+```
+
+Where an operation can fail several ways at once, the body also carries `codes` and `errors`
+arrays, and the first entry is repeated under `code` and `error`.
+
+## Status codes
+
+<ResponseField name="404" type="no relationship">
+  You have no relationship to this app at all. It answers the same way a genuinely missing app
+  does, on purpose: whether an app exists is not something an unrelated caller gets to learn.
+</ResponseField>
+
+<ResponseField name="403" type="the role denies it">
+  You have a relationship, and the roles it grants do not permit this operation.
+</ResponseField>
+
+Read responses drop fields your role may not read. Writes that touch fields your role may not set
+are rejected rather than silently ignored.

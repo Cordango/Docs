@@ -1,0 +1,105 @@
+---
+title: Claude Code
+description: "Starting prompt and setup for Claude Code."
+---
+
+Claude Code reads `CLAUDE.md` from the workspace root automatically, and `cordango new` writes one.
+There is nothing to configure.
+
+<Steps>
+  <Step title="Create the workspace">
+    ```bash
+    mkdir acme && cd acme
+    cordango new support
+    ```
+  </Step>
+  <Step title="Start Claude Code in it">
+    ```bash
+    claude
+    ```
+
+    It picks up `CLAUDE.md` on its own. Confirm with `/memory` if you want to see what it loaded.
+  </Step>
+</Steps>
+
+## Let it run check freely
+
+`cordango check` calls no model and touches no database, so approving it every time is friction for
+nothing. Allow it once in `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(cordango check:*)",
+      "Bash(cordango inspect:*)",
+      "Bash(cordango vocabulary:*)",
+      "Bash(cordango fmt:*)"
+    ]
+  }
+}
+```
+
+Those four are read-only or formatting-only. Leave `cordango apply`, `cordango build` and
+`cordango publish` to prompt.
+
+## Starting prompt
+
+Short and about the job. `CLAUDE.md` supplies everything else.
+
+```text
+Add a "priority" field to the ticket entity: a select with low, normal, high and urgent,
+defaulting to normal. Show it as a column on the tickets table, and colour the urgent option red.
+
+Run cordango check when you are done, and show me the diff. Do not commit.
+```
+
+## Starting from nothing
+
+When there is no app yet, describe the job rather than the data model. Cordango's whole point is
+that it works out the second from the first.
+
+```text
+Build a support desk app in this workspace.
+
+The job: a small team receives customer problems by email, works them, and needs to see what is
+overdue. Tickets belong to a customer company, have an owner, move through new / in progress /
+waiting on customer / resolved, and carry a priority.
+
+Before you declare entities, run cordango inspect to see which core apps this workspace already
+has, and reference them rather than modelling your own copy.
+
+Work one aggregate at a time and run cordango check between each. Stop and show me the plan
+before you write any files.
+```
+
+<Tip>
+"Stop and show me the plan first" is worth the extra turn. The one change that is genuinely painful
+to undo later is duplicating an entity that a core app already provides, and that decision happens
+in the first thirty seconds.
+</Tip>
+
+## A reusable command
+
+Put this in `.claude/commands/cord-check.md` and it becomes `/cord-check`:
+
+```markdown
+---
+description: Validate every app in this workspace and explain any failure
+---
+
+Run `cordango check --json` for the workspace.
+
+For each app, report one of three outcomes:
+- not coherent: list every error with the file it came from
+- coherent but incomplete: list what is missing, and say plainly that this is normal mid-build
+- coherent and complete
+
+Do not fix anything unless I ask. Just report.
+```
+
+## What it will not do
+
+`CLAUDE.md` tells it not to commit and not to accept its own work. `cordango apply` writes to the
+working tree, and a person reads `git diff` and stages it. If you want that changed, change it in
+`CLAUDE.md` rather than in the prompt, so it holds across sessions.

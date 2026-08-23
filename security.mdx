@@ -1,0 +1,104 @@
+---
+title: Security & privacy
+description: "What leaves your machine, and what does not."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+## What runs offline
+
+Everything in the authoring loop. `new`, `add app`, `import`, `check`, `validate`, `targets`,
+`build`, `inspect`, `vocabulary`, `apply`, `fmt`, `doctor` and `version` make no network call,
+contact no model, and need no account.
+
+That is not a side effect. `cordango check` has to work from a clone of the open source repository
+with nothing above it, and the test that proves it is a test.
+
+<PlatformBeta />
+
+## What reaches the network
+
+Four commands: `login`, `whoami`, `publish` and `logout`. The CLI's own help lists them separately
+for exactly this reason.
+
+<ResponseField name="login" type="sends a token">
+  Connects to the named instance and confirms the token.
+</ResponseField>
+
+<ResponseField name="whoami" type="asks the instance">
+  Which instance and which identity. `--offline` answers from stored credentials without calling
+  out.
+</ResponseField>
+
+<ResponseField name="publish" type="sends your app">
+  Builds from source and sends the resulting App Definition to the instance. Your definition. Not
+  your source files, and not your git history.
+</ResponseField>
+
+<ResponseField name="logout" type="local only">
+  Forgets a credential on this machine. See the warning below.
+</ResponseField>
+
+## Tokens
+
+A token is a dotted string with a fixed, scannable prefix.
+
+```text
+cord_pat.<keyId>.<secret>
+cord_cxt.<keyId>.<secret>.<encodedAddress>
+```
+
+The prefix is there so a leaked credential is recognisable to a secret scanner on sight. The key id
+is separate from the secret so a key can be named in a log or an audit entry without that log
+holding anything usable.
+
+**An exchange token's embedded address is a claim, not authority.** It says which instance and
+tenant it belongs to. `cordango login` connects to the named instance, asks the server which tenant
+it actually belongs to, and refuses when the two disagree. A pasted credential does not get to tell
+the CLI where to send itself.
+
+<Warning>
+`cordango logout` forgets a credential on the machine it runs on. **It does not revoke it.** A key
+that has leaked keeps working until you delete it on the instance, under the same Personal Access
+Keys screen that minted it.
+</Warning>
+
+Pass a token as `--token` rather than positionally if you would rather it stayed out of your shell
+history. Both spellings work.
+
+## What a key can do
+
+A key acts as you. It carries your relationships and the roles those grant, so it reaches exactly
+what you reach and nothing more. There is no key that is broader than its owner.
+
+## AI
+
+There is no AI in the open source product. The compiler, the CLI and the generator call no model,
+and a generated application contains no AI at runtime.
+
+AI is a Cordango Platform feature. It runs on the instance, on your workspace's data, under that
+instance's terms.
+
+An AI coding agent you point at your workspace yourself is a separate matter, and the ordinary one:
+whatever you give it goes wherever that vendor sends it. Your semantic source is the description of
+your business. Treat sharing it with an agent as the disclosure it is, and check your agent's data
+retention terms rather than ours.
+
+## The generated application
+
+What comes out of `cordango build` is yours, and its security is yours.
+
+The scaffold arrives with the parts that are easy to get wrong already right: the first-run account
+endpoint that closes permanently, data protection keys on a volume rather than in the container,
+antiforgery wired up, and cookies configured to survive a plain-HTTP local run without shipping that
+setting to production.
+
+Everything after that is an ordinary ASP.NET Core deployment. Nothing in it phones home, and
+nothing in it needs us to keep existing.
+
+## Reporting something
+
+Security issues in the compiler, CLI or generator belong at
+[github.com/cordango/cordango](https://github.com/cordango/cordango). Please report privately
+rather than in a public issue.

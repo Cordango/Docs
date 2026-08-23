@@ -1,0 +1,95 @@
+---
+title: Targets
+description: "What turns an App Definition into a running application."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+A target is a generator. It takes an App Definition and produces something that runs.
+
+```bash
+cordango targets
+```
+
+`dotnet-vue` is the first-party one: ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify.
+
+## Every target declares both halves
+
+A target reports what it supports and, separately, what it deliberately withholds. Those are not
+the same as each other, and neither is the same as a third case: something the target has never
+heard of.
+
+<ResponseField name="Supported" type="it builds">
+  The target generates this.
+</ResponseField>
+
+<ResponseField name="Withheld" type="it will not build, and says why">
+  The target knows this construct and has a reason for not generating it. The reason is part of the
+  declaration, so the answer you get is "not this, because…" rather than silence.
+</ResponseField>
+
+<ResponseField name="Unknown" type="never heard of it">
+  A different answer, and worth not blurring with the one above. It usually means a typo or a
+  construct newer than the target.
+</ResponseField>
+
+Capabilities are declared per concern: blocks, effects, triggers, field types, platform targets and
+platform entities, plus whether the target can do windowed rollups and series or `prev()`
+references.
+
+## Asking about one app and one target
+
+```bash
+cordango check --app support --target dotnet-vue
+```
+
+Without `--target` this is an ordinary validity check. With one, it also answers whether that
+generator can build this app, and lists anything it cannot.
+
+## Missing behaviour is loud
+
+```bash
+cordango build --app support --target dotnet-vue --out ./out
+```
+
+If the app uses something the target cannot generate, this **refuses**. It does not quietly emit an
+application with a workflow silently missing, because an app that looks finished and is not is worse
+than a build that failed.
+
+```bash
+cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
+```
+
+`--allow-incomplete` accepts it anyway and prints exactly what was left out. That is the right flag
+while you are still building. It is the wrong flag for a release.
+
+## The generated project is yours
+
+There is no runtime dependency on Cordango in the output. No license server, no account, no model
+API. It is an ordinary ASP.NET Core and Vue project, and it keeps working whether or not this
+project does.
+
+<ParamField path="--runtime package" type="flag">
+  Reference `Cordango.Standalone` from NuGet instead of emitting it as source. The default emits
+  source, which is what makes the output independent.
+</ParamField>
+
+<ParamField path="--seed" type="number">
+  A different deterministic demo dataset.
+</ParamField>
+
+<PlatformBeta />
+
+## One definition, two products
+
+The same App Definition runs on the Cordango Platform and generates a standalone application. What
+differs is what each supports.
+
+Cordango Open Source builds **one** application: its own backend, frontend, database, users,
+authentication and permissions. Not multi-tenant, no AI at runtime.
+
+Cordango Platform runs **many** applications as one company system: shared people and organizations
+across apps, cross-app references, audit history, governance, AI, search and managed hosting.
+
+Neither one silently drops what it cannot do.

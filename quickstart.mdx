@@ -1,0 +1,98 @@
+---
+title: Quickstart
+description: "From an empty directory to a running application."
+---
+
+Everything on this page happens on your machine. There is no account, no database, no model API and
+no network call until you choose to publish.
+
+<Steps>
+  <Step title="Install the CLI">
+    ```bash
+    curl -fsSL https://cordango.com/install.sh | sh
+    ```
+
+    See [Install](/cli/install) for the Homebrew and Scoop routes.
+  </Step>
+
+  <Step title="Create a workspace">
+    ```bash
+    mkdir helpdesk && cd helpdesk
+    cordango new support
+    ```
+
+    `cordango new` needs an empty directory. It creates a workspace and its first app. One
+    workspace holds many apps, so `cordango add app <name>` adds the next one.
+  </Step>
+
+  <Step title="Check it">
+    ```bash
+    cordango check
+    ```
+
+    Parse, lower and validate. No model, no database, no network. This is the command to keep in a
+    pre-commit hook and in CI, and it works from a clone of the open source repository with nothing
+    else installed.
+  </Step>
+
+  <Step title="See what you can build it into">
+    ```bash
+    cordango targets
+    ```
+
+    Each target reports what it can generate and what it deliberately will not. Ask whether one
+    specific target can build one specific app:
+
+    ```bash
+    cordango check --app support --target dotnet-vue
+    ```
+  </Step>
+
+  <Step title="Generate the application">
+    ```bash
+    cordango build --app support --target dotnet-vue --out ./out
+    ```
+
+    That writes a complete ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify project into
+    `./out`. It is ordinary source code and it is yours. There is no license server, no account and
+    no runtime dependency on Cordango in what comes out.
+  </Step>
+
+  <Step title="Run it">
+    ```bash
+    cd out && docker compose up
+    ```
+
+    The first screen asks you to create the administrator account. A password delivered by a log
+    line is not delivered, so the endpoint that creates that first account closes for good once it
+    has been used.
+  </Step>
+</Steps>
+
+## When the generator cannot finish
+
+Missing behaviour is loud. If an app uses something the target cannot generate yet, the build
+refuses rather than quietly producing an application that is subtly wrong.
+
+```bash
+cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
+```
+
+`--allow-incomplete` accepts the build anyway, and tells you exactly what was left out.
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Build with an AI agent" icon="sparkles" href="/ai/overview">
+    Tuned starting prompts for Claude Code, Codex, Cursor and GLM.
+  </Card>
+  <Card title="Concepts" icon="diagram-project" href="/concepts">
+    What a workspace, an app and an App Definition actually are.
+  </Card>
+  <Card title="Editing an app" icon="pen" href="/guides/authoring">
+    Changing semantic source, and the four rules worth knowing.
+  </Card>
+  <Card title="Deploying" icon="server" href="/guides/deploying">
+    Running what the generator produced.
+  </Card>
+</CardGroup>

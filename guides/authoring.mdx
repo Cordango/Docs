@@ -1,0 +1,87 @@
+---
+title: Editing an app
+description: "Changing semantic source by hand."
+---
+
+Two ways to change an app, both supported: edit the `.cordango.yaml` files directly, or apply
+[semantic operations](/guides/semantic-ops). Both assemble into the same model, so the choice is
+about what is convenient rather than what is correct.
+
+Hand-editing is the right choice for a small, known change. Semantic operations are the right
+choice for structural change and for anything an agent is driving.
+
+## Find the file first
+
+```bash
+cordango inspect --app support                  # what this app holds
+cordango inspect entities/ticket --app support  # one aggregate
+```
+
+The directory layout is a convention for humans. What makes a file an entity is the `entity:` key
+on its first line, not which folder it sits in.
+
+## Check what you may write
+
+```bash
+cordango vocabulary field
+cordango vocabulary block table
+```
+
+This answers from the build you have installed, so it cannot disagree with what your CLI will
+accept. Do not go reading the App Definition schema; see [The schema](/concepts/schema).
+
+## Then check the change
+
+```bash
+cordango check --app support
+```
+
+No model, no database, no network. It is free, and it reports against the file and line you wrote
+rather than a path into a compiled document. Run it constantly.
+
+## Format afterwards
+
+```bash
+cordango fmt
+```
+
+Canonical key order and quoting for every `.cordango.yaml` file. Run it after hand-editing so the
+next diff shows a change in meaning rather than a change in whitespace.
+
+## Four rules
+
+**One aggregate per change.** A diff touching one entity is a diff somebody can review. A diff
+touching nine is a diff that gets approved without being read.
+
+**Keys are stable.** Renaming an entity or field key is not supported, because nothing rewrites the
+references to it. Add the new one and remove the old one, deliberately, as two decisions.
+
+<Warning>
+There is no rename. A key you choose today is a key you live with or migrate away from by hand.
+Spend a moment on it.
+</Warning>
+
+**Never edit `.cordango/`.** The dotted directory is build output. Changes there vanish on the next
+`cordango build`, and they were never the source of anything.
+
+**Check before you declare.** Companies, people and calendar events already exist as
+[core apps](/concepts/core-apps). Reference them.
+
+## Bringing in an existing definition
+
+```bash
+cordango import ./app.definition.json --app support
+```
+
+That turns an App Definition into source files you can edit. It is the way in for an app that was
+built before the workspace existed, or one produced somewhere else.
+
+## Diagnosing a workspace
+
+```bash
+cordango doctor
+```
+
+This finds problems that are not source errors: an app registered in `cordango.yaml` whose
+directory is missing, a stale credential, a layout that does not add up. `cordango check` answers
+"is this app right"; `doctor` answers "is this workspace right".

@@ -1,0 +1,96 @@
+---
+title: Cursor
+description: "Starting prompt and setup for Cursor."
+---
+
+Cursor supports `AGENTS.md`, and `cordango new` writes one. Opening the workspace is usually all
+the setup there is.
+
+<Steps>
+  <Step title="Create the workspace">
+    ```bash
+    mkdir acme && cd acme
+    cordango new support
+    ```
+  </Step>
+  <Step title="Open it in Cursor">
+    ```bash
+    cursor .
+    ```
+  </Step>
+</Steps>
+
+## An always-on rule
+
+`AGENTS.md` covers the workflow. Where Cursor adds something is a rule that is guaranteed to be in
+context on every request, and one that attaches itself when a `.cordango.yaml` file is open.
+
+Project rules live in `.cursor/rules` and **must** use the `.mdc` extension. A plain `.md` file in
+that directory is ignored.
+
+```md
+---
+description: Cordango workspace rules
+alwaysApply: true
+---
+
+This is a Cordango workspace. Apps under `apps/` are defined by semantic source: `.cordango.yaml`
+files describing entities, workflows, roles and screens.
+
+- Run `cordango inspect` before changing anything. Never read the App Definition schema and never
+  read the cordango binary; `cordango vocabulary` is the authority on what may be written.
+- `cordango check` calls no model and touches no database. Run it after every change.
+- Never edit `.cordango/` (the dotted directory). It is build output.
+- Use stable keys. Renaming an entity or field key is not supported.
+- One aggregate per change.
+- Do not commit. A person reads `git diff` and stages it.
+```
+
+An auto-attached rule for the source files themselves:
+
+```md
+---
+globs: apps/**/*.cordango.yaml
+alwaysApply: false
+---
+
+- `fields` is a map keyed by field key, not an array.
+- Run `cordango vocabulary field` rather than guessing which properties a field type accepts.
+- Run `cordango fmt` after hand-editing so the diff shows meaning, not whitespace.
+```
+
+## Starting prompt
+
+```text
+Add a "priority" field to the ticket entity: a select with low, normal, high and urgent,
+defaulting to normal. Show it as a column on the tickets table.
+
+Run cordango check when you are done. Do not commit.
+```
+
+## Starting from nothing
+
+```text
+Build a support desk app in this workspace.
+
+The job: a small team receives customer problems, works them, and needs to see what is overdue.
+Tickets belong to a customer company, have an owner, move through new / in progress / waiting on
+customer / resolved, and carry a priority.
+
+Run cordango inspect first and tell me which core apps already exist, so we reference them instead
+of modelling our own companies. Show me the plan before writing files.
+
+Then work one aggregate at a time, running cordango check between each.
+```
+
+## Keep the editor out of the generated app
+
+If you generate an application into the workspace, exclude it from indexing. It is a large tree of
+ordinary ASP.NET Core and Vue code with nothing in it Cursor needs to reason about while you are
+authoring, and it will crowd out the source files that matter.
+
+```text
+# .cursorignore
+out/
+.cordango/
+```

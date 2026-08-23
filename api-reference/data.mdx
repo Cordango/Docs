@@ -1,0 +1,112 @@
+---
+title: Records
+description: "List, read, create, replace and delete records."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+## List
+
+```bash
+curl "https://acme.cordango.com/api/app/support/data/ticket?page=1&pageSize=50&sort=created_at" \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>"
+```
+
+<ParamField query="page" type="integer" default="1">
+  1-based page number.
+</ParamField>
+
+<ParamField query="pageSize" type="integer" default="50">
+  Records per page.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Field to sort by.
+</ParamField>
+
+<ParamField query="includeDeleted" type="boolean" default="false">
+  Include soft-deleted records.
+</ParamField>
+
+Any other query parameter is read as an equality filter on the field of that name.
+
+```
+?status=open&priority=high
+```
+
+## Filters
+
+Anything past equality goes in `filters`, a URL-encoded JSON array of
+`{ field, operator, value }`.
+
+```json
+[
+  { "field": "status", "operator": "in", "value": ["open", "pending"] },
+  { "field": "priority", "operator": "gte", "value": 3 }
+]
+```
+
+Operators: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, `notIn`, `isEmpty`,
+`isNotEmpty`.
+
+## Aggregate
+
+```bash
+curl "https://acme.cordango.com/api/app/support/data/ticket/aggregate?..." \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>"
+```
+
+Aggregation happens on the server, so the answer is correct across the whole entity rather than
+across one page.
+
+<Note>
+List and aggregate treat hidden fields differently, on purpose. A list silently drops a filter on a
+field you may not read, because a smaller result set leaks nothing. An aggregate refuses with a 403
+instead, because silently dropping a `field`, `groupBy` or `filter` would hand back a confidently
+wrong number.
+</Note>
+
+## Read one
+
+```bash
+curl https://acme.cordango.com/api/app/support/data/ticket/{recordId} \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>"
+```
+
+## Create
+
+```bash
+curl -X POST https://acme.cordango.com/api/app/support/data/ticket \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>" \
+  -H "Content-Type: application/json" \
+  -d '{ "subject": "Printer offline", "status": "open" }'
+```
+
+Creating a record runs whatever the definition says happens on creation: computed fields, workflow
+effects, cascades to related records. The API is the same door the product uses, so it gets the same
+behaviour.
+
+## Replace
+
+```bash
+curl -X PUT https://acme.cordango.com/api/app/support/data/ticket/{recordId} \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>" \
+  -H "Content-Type: application/json" \
+  -d '{ "subject": "Printer offline", "status": "resolved" }'
+```
+
+## Delete
+
+```bash
+curl -X DELETE https://acme.cordango.com/api/app/support/data/ticket/{recordId} \
+  -H "Authorization: Bearer cord_pat.<keyId>.<secret>"
+```
+
+`onDelete` behaviour declared in the definition is honoured here too.
+
+## Field visibility
+
+Responses drop fields your role may not read. A write touching a field your role may not set is
+rejected rather than partially applied.
