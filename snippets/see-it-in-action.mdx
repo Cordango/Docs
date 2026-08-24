@@ -1,0 +1,75 @@
+<Columns cols={2}>
+<Column>
+
+**What a person wrote**
+
+```
+expenses/
+  cordango.yaml
+  apps/expenses/
+    app.yaml
+    entities/
+      expense_claim.yaml
+    roles/
+      admin.yaml
+      approver.yaml
+      employee.yaml
+    views/
+      screens/
+        overview.yaml
+        claims.yaml
+        my_expenses.yaml
+      collections/
+        all_claims_table.yaml
+        inbox_table.yaml
+        my_claims_table.yaml
+      entities/expense_claim/
+        detail.yaml
+    workflows/
+      lifecycles/
+        claim_flow.yaml
+```
+
+</Column>
+<Column>
+
+**What the generator wrote**
+
+```
+out/
+  api/
+    Program.cs
+    Expenses.Api.csproj
+    Entities/
+      ExpenseClaim.cs
+    Data/
+      AppDbContext.cs
+      ExpenseClaimConfiguration.cs
+    Controllers/
+      ExpenseClaimController.cs
+    Migrations/
+      00000000000001_InitialCreate.cs
+    Security/AppRoles.cs
+    Workflows/AppWorkflows.cs
+    Identity/AppIdentity.cs
+  web/src/
+    pages/OverviewPage.vue
+    pages/ClaimsPage.vue
+    pages/MyExpensesPage.vue
+    pages/ExpenseClaimRecordPage.vue
+    blocks/   36 components
+    views/    7 screens of its own
+  Dockerfile
+  docker-compose.yml
+```
+
+</Column>
+</Columns>
+
+The right column is an excerpt. The real build writes 98 files from 14.
+
+<Note>
+The right side is the `dotnet-vue` [target](/concepts/targets), which generates ASP.NET Core, EF
+Core, PostgreSQL, Vue 3 and Vuetify. It is one target. Another would produce something different
+from the same left column.
+</Note>

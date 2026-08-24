@@ -61,6 +61,11 @@ The pages assert specifics that live in `cordango/cordango`: the command table
 semantic op names (`schemas/ops/*.json`), and the target ids
 (`src/Cordango.Cli/Generate/Targets.cs`).
 
+The "See it in action" trees on `concepts.mdx` assert generated filenames, from the emitters
+(`src/Cordango.SourceGen.DotNetVue/Emit/`) and the scaffold (`src/Cordango.Standalone/Templates/`).
+The file count beside them came from a real `cordango build` of the `expenses` example. Both drift
+silently when the generator changes.
+
 The API pages assert routes and the error envelope from the platform repository
 (`AppRuntimeController`, `ApiError`, `AccessKeyAuthentication`, `DataApi`).
 

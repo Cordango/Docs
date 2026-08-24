@@ -4,6 +4,7 @@ description: "How the pieces fit together."
 ---
 
 import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+import SeeItInAction from "/snippets/see-it-in-action.mdx";
 
 
 One idea sits in the middle of Cordango: an application is a **document** rather than a codebase.
@@ -34,6 +35,19 @@ Everything above the App Definition is the open foundation. It's Apache-2.0 and 
 `cordango check` needs no model, no database, no account and no network.
 
 <PlatformBeta />
+
+## See it in action
+
+That pipeline is easier to see with real files. The
+[expenses example](https://github.com/cordango/examples) is 14 files of YAML: one entity, three
+roles, three screens and an approval flow. On the right is what came out of it.
+
+<SeeItInAction />
+
+The entity became a class, a table configuration, a controller and a migration. The three roles
+became compiled permission rules. The lifecycle became a workflow the API enforces. Each screen
+became a page. It is ordinary source code and it is yours, but it is not where you make changes:
+edit the left column and generate again.
 
 ## The four things worth understanding
 

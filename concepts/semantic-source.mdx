@@ -41,7 +41,11 @@ That first line is how the compiler knows what it's reading. The directory layou
 
 ## An entity
 
-```yaml
+The same entity three ways: what you write, what it compiles to, and what the `dotnet-vue`
+generator turns that into.
+
+<CodeGroup>
+```yaml Semantic source
 entity: team
 kind: config
 label: Team
@@ -75,6 +79,73 @@ fields:
     type: longtext
     label: Description
 ```
+
+```json App Definition
+{
+  "key": "team",
+  "label": "Team",
+  "labelPlural": "Teams",
+  "description": "A functional team hiring is grouped by.",
+  "icon": "account-group",
+  "displayField": "name",
+  "kind": "config",
+  "fields": [
+    {
+      "key": "name",
+      "label": "Team Name",
+      "type": "text",
+      "required": true,
+      "unique": true
+    },
+    {
+      "key": "function",
+      "label": "Function",
+      "type": "select",
+      "required": true,
+      "options": [
+        { "value": "engineering", "label": "Engineering", "color": "#0f766e" },
+        { "value": "sales", "label": "Sales", "color": "#f59e0b" }
+      ]
+    },
+    {
+      "key": "default_salary",
+      "label": "Default Gross Salary / Year",
+      "type": "money",
+      "help": "Prefilled onto new hiring lines.",
+      "currency": "EUR"
+    },
+    {
+      "key": "description",
+      "label": "Description",
+      "type": "longtext"
+    }
+  ]
+}
+```
+
+```csharp Generated C#
+namespace Teams.Entities;
+
+public sealed class Team : IRecord, IHasTrackingFields
+{
+    [JsonPropertyName("id")] public string Id { get; set; } = "";
+
+    [JsonPropertyName("name")] public string Name { get; set; } = "";
+
+    [JsonPropertyName("function")] public string Function { get; set; } = "";
+
+    [JsonPropertyName("default_salary")] public decimal? DefaultSalary { get; set; }
+
+    [JsonPropertyName("description")] public string? Description { get; set; }
+
+    // created_at, created_by, updated_at, updated_by, deleted_at and
+    // record_state follow. The runtime fills them in.
+}
+```
+</CodeGroup>
+
+The C# tab is trimmed: the real file carries a doc comment on every property, and the tracking
+fields written out in full.
 
 `fields` is a **map keyed by field key**. The key is the identifier the rest of the app refers to,
 and everything under it describes what that field is.
