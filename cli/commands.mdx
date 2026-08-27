@@ -17,12 +17,13 @@ Every command accepts `--json`.
 | --- | --- |
 | `cordango new <first-app>` | Create a workspace and its first app. Needs an empty directory. |
 | `cordango add app <name>` | Add another app to this workspace. One workspace holds many. |
-| `cordango import <app.definition.json> [--app <name>]` | Bring an existing App Definition in as source files you can edit. |
+| `cordango configure [--target <id>]` | Decide once where this workspace's apps run, and write it into `cordango.yaml`. `--show` prints what is set. |
+| `cordango import <app.definition.json> [--app <name>]` | Bring an App Definition on disk in as source files you can edit. |
 | `cordango check [--app <key>] [--target <id>]` | Parse, lower and validate. No model, no database. With `--target`, also ask whether that generator can build it. |
 | `cordango validate [--app <key>] [--target <id>]` | The same command, spelled the other way. |
 | `cordango targets` | What this build can generate, and what each target deliberately won't. |
-| `cordango build [--app <key>]` | Write `.cordango/build/<key>/` artifacts. Deterministic. |
-| `cordango build --app <key> --target <id> --out <dir>` | Generate a whole application into a directory you own. |
+| `cordango build [--app <key>]` | Do what `configure` said. Deterministic. |
+| `cordango build --target <id> [--app <key>]` | Generate with a target this once, whatever the configuration says. |
 | `cordango inspect [path] [--app <key>]` | Describe the workspace, one app, or one aggregate. |
 | `cordango vocabulary [<name>]` | What may be written: Cord's words, or one construct's schema. |
 | `cordango apply <ops.json> --app <key> --scope <kind[:key]>` | Apply semantic operations and rewrite the affected source files. |
@@ -39,19 +40,78 @@ Every command accepts `--json`.
 | `cordango login <token> [--instance <url>]` | Connect to a Cordango instance. Make a token under your avatar, Personal Access Keys. |
 | `cordango whoami [--offline]` | Which instance this workspace publishes to, and as whom. |
 | `cordango publish [--app <key>] [--force]` | Build from source, send it to the instance, and make it live. |
+| `cordango import [<app>] [--list]` | The way back: bring one of the instance's apps in as source. With no name it asks which one. |
 | `cordango logout [--instance <url>] [--all]` | Forget a stored credential on this machine. Does not revoke it. |
 
-See [Publishing](/cli/publish) for what those four do in practice.
+See [Publishing](/cli/publish) for what those do in practice.
+
+## import
+
+Two routes into the same place — a definition becomes semantic source under `apps/`, split one file
+per aggregate, and it is registered in `cordango.yaml`.
+
+```bash
+cordango import expenses.json     # a file. No connection, no account, no network.
+
+cordango import                   # connected: lists the apps you can reach, and asks
+cordango import support           # or name one, when you already know
+cordango import --list            # just look
+```
+
+The remote route is what makes publishing a round trip: an app built in Studio, or published from
+somebody else's checkout, comes back as files you can read, diff and edit.
+
+<ParamField path="--app" type="name">
+  The directory under `apps/` to import into. Defaults to the app's handle, or its key for a file.
+  Use it to import a second copy alongside one you already have.
+</ParamField>
+
+Importing never merges. An app whose directory already exists is refused rather than half-overwritten
+— it would have to guess which of two versions of an aggregate you meant.
+
+A file path that exists always wins over an app of the same name, so `./support` is never ambiguous.
+
+## configure
+
+Where a workspace's apps are meant to run is one decision, and it belongs in the repository rather
+than in everybody's shell history.
+
+```bash
+cordango configure                        # asks, when somebody is there to ask
+cordango configure --target standalone    # the same answer, as a flag
+cordango configure --show                 # what is set, if anything
+```
+
+It writes a `build:` block into `cordango.yaml`, which is committed. `cordango build` then needs no
+flags, for you or for anyone who clones it.
+
+<ParamField path="--target" type="standalone | dotnet-vue | platform">
+  `standalone` generates a repository of its own. `platform` publishes to a Cordango instance.
+</ParamField>
+
+Where the output goes is not one of the questions. A generated application lands in
+`generated/<app>/` inside the workspace, one directory per app, and there is no `--out`. It is
+gitignored build output, reproducible from the source beside it — and still yours: move the
+directory when an application is ready to have a life of its own.
+
+The `platform` target needs a connection, and both `configure` and `build` refuse without one. That
+isn't ceremony: on the platform an app can see the other apps in the workspace and the core apps, so
+there is nothing useful to decide about it offline. Run [`cordango login`](/cli/publish) first.
+
+A workspace with no `build:` block is not misconfigured — nobody has been asked yet. `cordango build`
+asks when there is a terminal, and otherwise writes its definition artifacts and says what it did
+not do.
 
 ## build
 
 `cordango build` on its own writes deterministic build artifacts under `.cordango/build/<key>/`.
-Given the same source it writes the same bytes.
+Given the same source it writes the same bytes. When the workspace is configured for a target, it
+also generates each app into `generated/<key>/`.
 
-With a target and an output directory it generates a complete application instead:
+`--target` on the command line overrides the configuration for that one run:
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out
+cordango build --app support --target dotnet-vue
 ```
 
 <ParamField path="--seed" type="number">

@@ -50,17 +50,17 @@ network call until you choose to publish.
 
   <Step title="Generate the application">
     ```bash
-    cordango build --app support --target dotnet-vue --out ./out
+    cordango build --app support --target dotnet-vue
     ```
 
     That writes a complete ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify project into
-    `./out`. It's ordinary source code, and it's yours. What comes out has no license server, no
+    `generated/support/`. It's ordinary source code, and it's yours. What comes out has no license server, no
     account and no runtime dependency on Cordango.
   </Step>
 
   <Step title="Run it">
     ```bash
-    cd out && docker compose up
+    cd generated/support && docker compose up
     ```
 
     The first screen asks you to create the administrator account. A password delivered by a log
@@ -75,7 +75,7 @@ Missing behaviour is loud. If an app uses something the target can't generate ye
 instead of quietly producing an application that's subtly wrong.
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
+cordango build --app support --target dotnet-vue --allow-incomplete
 ```
 
 `--allow-incomplete` accepts the build anyway, and tells you exactly what got left out.

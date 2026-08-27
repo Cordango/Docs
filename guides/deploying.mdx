@@ -7,17 +7,17 @@ import PlatformBeta from "/snippets/platform-beta-inline.mdx";
 
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out
+cordango build --app support --target dotnet-vue
 ```
 
-What lands in `./out` is an ordinary ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify project.
+What lands in `generated/support/` is an ordinary ASP.NET Core, EF Core, PostgreSQL, Vue 3 and Vuetify project.
 No license server, no account, no model API, no runtime dependency on Cordango. It keeps working
 whether or not this project does.
 
 ## Run it
 
 ```bash
-cd out
+cd generated/support
 docker compose up
 ```
 
@@ -74,7 +74,7 @@ later, not a decision you are locked out of.
 ## Seed data
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out --seed 7
+cordango build --app support --target dotnet-vue --seed 7
 ```
 
 Deterministic demo data. The same seed produces the same dataset, which is what you want for a demo

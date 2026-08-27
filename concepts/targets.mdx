@@ -53,7 +53,7 @@ generator can build this app, and lists anything it can't.
 ## Missing behaviour is loud
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out
+cordango build --app support --target dotnet-vue
 ```
 
 If the app uses something the target can't generate, this **refuses**. It won't quietly hand you an
@@ -61,7 +61,7 @@ application with a workflow missing, because an app that looks finished and isn'
 build that failed.
 
 ```bash
-cordango build --app support --target dotnet-vue --out ./out --allow-incomplete
+cordango build --app support --target dotnet-vue --allow-incomplete
 ```
 
 `--allow-incomplete` accepts it anyway and prints exactly what got left out. Right flag while you're
