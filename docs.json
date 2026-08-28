@@ -132,5 +132,10 @@
       "website": "https://cordango.com",
       "github": "https://github.com/cordango"
     }
+  },
+    "seo": {
+    "metatags": {
+      "canonical": "https://docs.cordango.com"
+    }
   }
 }
