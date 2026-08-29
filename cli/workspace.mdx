@@ -9,6 +9,8 @@ acme/
   apps/
     support/
       *.cordango.yaml    semantic source, one file per aggregate
+  generated/
+    support/             the generated application, one directory per app. Not committed.
   .cordango/             build output. Not committed.
   README.md
   CLAUDE.md
@@ -31,10 +33,18 @@ cordango fmt
 `fmt` rewrites every `.cordango.yaml` file in canonical form, so a diff shows a change in meaning
 instead of a change in whitespace or key order.
 
-## The build directory
+## The build directories
 
-`.cordango/` with the leading dot is build output. `cordango build` regenerates it, and it doesn't
-get committed. `cordango new` writes a `.gitignore` that already excludes it.
+Two, and neither is committed. `cordango new` writes a `.gitignore` that already excludes both.
+
+`.cordango/` with the leading dot holds the definition artifacts — the compiled App Definition and
+its manifest. `cordango build` regenerates it.
+
+`generated/` holds the applications themselves, one directory per app, so a workspace with `support`
+and `billing` in it builds to `generated/support/` and `generated/billing/`. There is no `--out`:
+where the output goes is not a decision anybody has to make twice. It's ordinary source code and
+it's reproducible from the `apps/` directory beside it, which is why it stays out of git — and
+moving a directory out of the workspace is how an application leaves.
 
 ## Agent instructions
 

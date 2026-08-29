@@ -85,9 +85,38 @@ cordango configure --show                 # what is set, if anything
 It writes a `build:` block into `cordango.yaml`, which is committed. `cordango build` then needs no
 flags, for you or for anyone who clones it.
 
+```yaml cordango.yaml
+build:
+  target: standalone
+  runtime: package
+  allowIncomplete: false
+  seed: 42
+```
+
+Every flag `build` takes for one run, `configure` takes to settle for good. A `platform` workspace
+writes `target` alone — the other three describe generating source into a directory, which
+publishing does not do.
+
 <ParamField path="--target" type="standalone | dotnet-vue | platform">
   `standalone` generates a repository of its own. `platform` publishes to a Cordango instance.
 </ParamField>
+
+<ParamField path="--runtime" type="package | source">
+  `package` restores `Cordango.Standalone` from NuGet. `source` checks it into the generated project
+  instead. Defaults to `package`.
+</ParamField>
+
+<ParamField path="--seed" type="number">
+  The demo dataset every build of this workspace gets.
+</ParamField>
+
+<ParamField path="--allow-incomplete" type="flag">
+  Settle for builds the generator can't finish. Right while you're still building, wrong for a
+  release — so this one is worth leaving unset and passing per run.
+</ParamField>
+
+A missing key inside a `build:` block that exists takes its default rather than failing, so a
+hand-written two-line block is a perfectly good one.
 
 Where the output goes is not one of the questions. A generated application lands in
 `generated/<app>/` inside the workspace, one directory per app, and there is no `--out`. It is

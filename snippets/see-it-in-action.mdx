@@ -7,27 +7,27 @@
 expenses/
   cordango.yaml
   apps/expenses/
-    app.yaml
+    app.cordango.yaml
     entities/
-      expense_claim.yaml
+      expense_claim.cordango.yaml
     roles/
-      admin.yaml
-      approver.yaml
-      employee.yaml
+      admin.cordango.yaml
+      approver.cordango.yaml
+      employee.cordango.yaml
     views/
       screens/
-        overview.yaml
-        claims.yaml
-        my_expenses.yaml
+        overview.cordango.yaml
+        claims.cordango.yaml
+        my_expenses.cordango.yaml
       collections/
-        all_claims_table.yaml
-        inbox_table.yaml
-        my_claims_table.yaml
+        all_claims_table.cordango.yaml
+        inbox_table.cordango.yaml
+        my_claims_table.cordango.yaml
       entities/expense_claim/
-        detail.yaml
+        detail.cordango.yaml
     workflows/
       lifecycles/
-        claim_flow.yaml
+        claim_flow.cordango.yaml
 ```
 
 </Column>
@@ -36,7 +36,7 @@ expenses/
 **What the generator wrote**
 
 ```
-out/
+generated/expenses/
   api/
     Program.cs
     Expenses.Api.csproj
@@ -57,7 +57,7 @@ out/
     pages/ClaimsPage.vue
     pages/MyExpensesPage.vue
     pages/ExpenseClaimRecordPage.vue
-    blocks/   36 components
+    blocks/   40 components
     views/    7 screens of its own
   Dockerfile
   docker-compose.yml
@@ -66,7 +66,7 @@ out/
 </Column>
 </Columns>
 
-The right column is an excerpt. The real build writes 98 files from 14.
+The right column is an excerpt. The real build writes 103 files from 14.
 
 <Note>
 The right side is the `dotnet-vue` [target](/concepts/targets), which generates ASP.NET Core, EF
