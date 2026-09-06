@@ -20,7 +20,8 @@ Cordango source              .cordango.yaml, one aggregate per file
      |
   compiler
      |
-App Definition               the canonical contract, one JSON document
+App Definition               what the app IS, one JSON document
+App Contract                 what it OFFERS, compiled beside it
      |
      +----------------------+
      |                      |
@@ -49,7 +50,7 @@ became compiled permission rules. The lifecycle became a workflow the API enforc
 became a page. It is ordinary source code and it is yours, but it is not where you make changes:
 edit the left column and generate again.
 
-## The four things worth understanding
+## The things worth understanding
 
 <CardGroup cols={2}>
   <Card title="Semantic source" icon="file-code" href="/concepts/semantic-source">
@@ -57,7 +58,14 @@ edit the left column and generate again.
     screen.
   </Card>
   <Card title="The App Definition" icon="brackets-curly" href="/concepts/app-definition">
-    The single JSON document your source compiles into. The contract everything downstream reads.
+    The single JSON document your source compiles into. What the app is.
+  </Card>
+  <Card title="The App Contract" icon="handshake" href="/concepts/app-contract">
+    Compiled beside it. What the app offers: its purpose, what it announces, what it accepts.
+  </Card>
+  <Card title="Apps working together" icon="diagram-project" href="/concepts/cross-app">
+    Point at another app's records, or react to what it announces. Neither app is written for the
+    other.
   </Card>
   <Card title="The schema" icon="shield-check" href="/concepts/schema">
     The formal gate. Why you should ask `cordango vocabulary` instead of reading it.

@@ -25,6 +25,7 @@ Every command accepts `--json`.
 | `cordango build [--app <key>]` | Do what `configure` said. Deterministic. |
 | `cordango build --target <id> [--app <key>]` | Generate with a target this once, whatever the configuration says. |
 | `cordango inspect [path] [--app <key>]` | Describe the workspace, one app, or one aggregate. |
+| `cordango discover [<query>] [--entities\|--events\|--actions\|--rules] [--limit <n>]` | What already exists: every app's entities, the events it announces, the actions it offers. Run it BEFORE modelling. A login adds the rest of the instance's apps. |
 | `cordango vocabulary [<name>]` | What may be written: Cord's words, or one construct's schema. |
 | `cordango apply <ops.json> --app <key> --scope <kind[:key]>` | Apply semantic operations and rewrite the affected source files. |
 | `cordango fmt [--app <key>]` | Rewrite every `.cordango.yaml` file in canonical form. |

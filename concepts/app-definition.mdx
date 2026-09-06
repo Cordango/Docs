@@ -3,9 +3,12 @@ title: The App Definition
 description: "The JSON document your source compiles into."
 ---
 
-The App Definition is one JSON document that fully describes an application. It's the contract
-everything downstream consumes. The runtime, the UI renderer, the standalone generator and the
-publish pipeline all read this and nothing else.
+The App Definition is one JSON document that fully describes an application. The runtime, the UI
+renderer, the standalone generator and the publish pipeline all read this and nothing else.
+
+It says what the app **is**. What the app **offers** to everything outside it — its purpose, the
+events it announces, the actions it accepts — is a second compiled document, the
+[App Contract](/concepts/app-contract).
 
 You don't write it. You write [semantic source](/concepts/semantic-source), and the compiler
 produces this.

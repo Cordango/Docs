@@ -41,6 +41,16 @@ Capabilities are declared per concern: blocks, effects, triggers, field types, p
 platform entities, plus whether the target can do windowed rollups and series or `prev()`
 references.
 
+The clearest example of Withheld is the pair of cross-app triggers. A standalone build is one
+application, and one application has nobody to subscribe to, so `command.emitted` and
+`process.state_entered` are withheld with exactly that reason rather than left looking unfinished:
+
+```
+workflow 'commit_on_purchase_approved' triggers on 'process.state_entered': a subscription to
+another application's record entering a state, and a standalone build is one application —
+install both on Cordango Platform, where the other one exists
+```
+
 ## Asking about one app and one target
 
 ```bash

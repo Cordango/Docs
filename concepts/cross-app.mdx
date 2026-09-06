@@ -1,0 +1,166 @@
+---
+title: Apps working together
+description: "Point at another app's records, or react to what it announces."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Apps do not live alone. One can point at another's records, and one can react to what another
+announces — without either app being written for the other.
+
+The rule that makes it work is worth stating first: **the app being used is never consulted and never
+knows.** It declares what it holds and what it announces, and stops there. Adding a second app that
+listens changes nothing in the first.
+
+<PlatformBeta />
+
+## Three ways, in order of how much they cost you
+
+<CardGroup cols={3}>
+  <Card title="A shared record" icon="building">
+    Both apps point at the same core app. No coupling at all.
+  </Card>
+  <Card title="A reference" icon="link">
+    Your field names another app's entity. One line.
+  </Card>
+  <Card title="A subscription" icon="bolt">
+    Your workflow reacts to what another app announces.
+  </Card>
+</CardGroup>
+
+## A shared record
+
+The cheapest connection is the one you do not author. Two apps that both point at
+`core_organizations.organization` are talking about the same company, and neither keeps its own
+spelling of the name.
+
+See [Core apps](/concepts/core-apps).
+
+## A reference into another app
+
+An ordinary reference field, with another app's key in `targetApp`:
+
+```yaml
+fields:
+  budget_line:
+    type: reference
+    label: Budget line
+    targetApp: budget_tracker
+    target: budget_line
+```
+
+You get a picker that offers real records, a chip that opens the record where it lives, and — on the
+other app's record — a panel listing everything that points at it. Budget Tracker was not told any of
+this would happen.
+
+`cordango check` validates it against the other apps in your workspace, so a typo in the app key or
+the entity is caught before you build.
+
+### Installed together, or not yet
+
+A reference has to resolve to a real table, and the two rules differ by where you are:
+
+| Where | An app the roster does not hold |
+| --- | --- |
+| In a workspace | An error. Everything that will sit beside this app is on disk, so it is a typo. |
+| On an instance | Fine. It is not installed **yet** — install it later and the field starts working. |
+
+That second row is deliberate. An app that named a companion and could only be installed *after* it
+would make every app in a connected set un-installable on its own, which is the opposite of the
+point. The write still refuses a reference into an app that is not there, so nothing is trusted — it
+is only not refused early.
+
+## A subscription to what another app announces
+
+An automation whose trigger names another app:
+
+```yaml
+automation: commit_on_purchase_approved
+name: Commit the money when a purchase is approved
+trigger: state.entered
+app: purchase_requests
+event: purchase_request.approved
+effects:
+  - type: createRecord
+    entity: spend_entry
+    set:
+      budget_line: '{{record.budget_line}}'
+      amount: '{{record.amount}}'
+      kind: commitment
+```
+
+`{{record.*}}` is the **source** app's record — the purchase request. That is what lets a
+subscription carry data without either app declaring a payload shape.
+
+### What you may subscribe to
+
+| `trigger:` | `event:` | Use it when |
+| --- | --- | --- |
+| `state.entered` | `<entity>.<state>` | A record reached a state, however it got there |
+| `event.emitted` | a name the app declares in `emits` | The app announced something in its own words |
+| `record.created` / `record.updated` / `record.deleted` | — | Any write, with `entity:` naming which |
+
+Reach for `state.entered` when several transitions end in the same place. Three approval steps that
+all reach `approved` are one fact, and it is the state, not any one of the commands.
+
+### Writing into another app
+
+A `createRecord` effect may name the app it writes into:
+
+```yaml
+effects:
+  - type: createRecord
+    app: budget_tracker
+    entity: spend_entry
+    set:
+      description: '{{record.title}}'
+```
+
+<Warning>
+Only reachable from a workflow that is subscribed to something. A cross-app write from an ordinary
+automation is refused — otherwise any app could write into any other on its own authority.
+</Warning>
+
+`updateRecord` deliberately cannot do this. Updating a record somewhere else means **finding** it
+first, and that is a cross-app query, which is not built yet.
+
+## Who a reaction runs as
+
+The **subscribing app's owner**. Not the person whose click caused the event: approving a purchase is
+not agreeing to have budgets written on your behalf. Not an administrator either.
+
+The same permission question is asked that the API asks before an ordinary create, so a reaction can
+never do something the person it runs as could not do by hand. A revoked grant stops it, visibly, in
+the run log.
+
+Loops are bounded by the same depth cap that bounds a cascade inside one app, so A reacting to B
+reacting to A terminates.
+
+## Seeing what is there
+
+```bash
+cordango discover                    # every app, what it announces, what it offers
+cordango discover --events           # just the announcements
+cordango discover --actions          # just what can be asked of them
+cordango discover "supplier"         # search, when you do not know the key
+```
+
+Run it **before** modelling. If something already exists, link to it instead of declaring it again.
+
+## What is not built yet
+
+<Note>
+**Cross-app queries.** A purchase request cannot display "this would take Marketing over its plan",
+even though the budget line it points at knows the number. Reading another app's field at display
+time is planned, not built.
+
+**Suggested connections.** Cordango can already tell you what every app announces and what every app
+accepts. Matching the two automatically and offering to wire them is planned.
+</Note>
+
+## A worked example
+
+The [connected starter pack](https://github.com/cordango/examples) is eight apps in three workspaces
+that use every mechanism on this page. Start with `finance/`, which is the shortest path to seeing a
+purchase approval turn into committed spend.

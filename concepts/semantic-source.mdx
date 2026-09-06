@@ -243,6 +243,24 @@ effects:
       owner: "{{actor.id}}"
 ```
 
+A trigger can also name **another app**, which is how one app reacts to what another announces. The
+app being listened to is not changed and does not know:
+
+```yaml
+automation: commit_on_purchase_approved
+name: Commit the money when a purchase is approved
+trigger: state.entered
+app: purchase_requests
+event: purchase_request.approved
+effects:
+  - type: createRecord
+    entity: spend_entry
+    set:
+      amount: "{{record.amount}}"
+```
+
+See [Apps working together](/concepts/cross-app).
+
 ## The app file
 
 One per app, holding everything no single aggregate owns: identity, theme, relations between

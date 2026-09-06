@@ -1,0 +1,120 @@
+---
+title: App Contract
+description: "What an app offers, compiled beside what it is."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Every app has two parts. The **App Definition** says what the app *is* — you author it, and the
+compiler consumes it. The **App Contract** says what the app *offers* — it is compiled, and
+everything outside the app reads it: other apps, agents, connectors, the catalog.
+
+The manifest is not the contract. The manifest serves the runtime and may change shape whenever the
+compiler wants. The contract serves everything outside, and its stability is a promise.
+
+```bash
+cordango build          # writes contract.json beside app.json
+cordango discover       # read every app's contract, here and on your instance
+```
+
+The contract is compiled locally and needs nothing. Reading the contracts of apps installed on an
+instance is the part that needs one.
+
+<PlatformBeta />
+
+## What is in it
+
+```
+identity      key, name, version, hashes
+purpose       summary + duties          ← authored
+entities      keys, labels, fields and their TYPES
+dependencies  the apps this one builds on, and how we know
+events        what it announces
+actions       what it can be asked to do
+rules         what an action will refuse
+```
+
+Everything is derived from the definition except `purpose` and `uses`, which are in the definition
+because no compiler can work them out.
+
+## purpose — why the app exists
+
+Nothing in a list of entities says whether they are there to run a sales pipeline or to record its
+aftermath. That is what `purpose` is for.
+
+```yaml
+purpose:
+  summary: Owns the request to buy something — what is wanted, what it costs, who agreed.
+  duties:
+    - owns purchase requests, their line items and their quotes
+    - routes approval by amount, and refuses to let somebody approve their own request
+    - records what was actually bought, which is rarely the estimate
+```
+
+<Note>
+A duty is a claim other apps may rely on, so state what this app **owns**, never what it merely
+displays. "Shows the budget" is not a duty. "Owns committed spend against a line" is.
+</Note>
+
+## uses — the apps you build on
+
+Declared intent, stated once, before any field points anywhere.
+
+```yaml
+uses:
+  - app: core_organizations
+    entities: [organization]
+    why: a vendor is the same company record the whole workspace uses
+  - app: budget_tracker
+    entities: [budget_line]
+    why: an approval commits against the line the request named
+```
+
+The compiler never writes into `uses`. A reference to an app you did not declare is reported to you,
+not quietly added:
+
+```
+note: 'budget_tracker' is referenced by 'spend_entry.budget_line' but is not declared in `uses`
+    declare it: uses: [{ app: budget_tracker, entities: [budget_line] }]
+```
+
+The platform directory (`targetApp: platform`) is never listed. Every app has it, so declaring it
+would be noise on every definition in existence.
+
+## events — three kinds, and they are not the same
+
+| Kind | When | Named |
+| --- | --- | --- |
+| `record.created` / `.updated` / `.deleted` | every write | `<entity>.created` |
+| `process.state_entered` | a governed status field moved | `<entity>.<state>` |
+| `command.emitted` | a command announced a name it declares in `emits` | whatever you called it |
+
+Every write already announces the first kind, and a command that moves a process state already
+announces the second. So only declare `emits` when the domain word differs from the state key:
+
+```yaml
+transitions:
+  mark_purchased:
+    to: purchased
+    action:
+      emits:
+        - purchase.completed     # "completed" says more than "purchased"
+```
+
+<Warning>
+An emitted name may be announced by **one** command. If three transitions all reach `approved`, none
+of them may claim `purchase.approved` — a name that identifies three things identifies nothing.
+Subscribe to the state instead, which the runtime announces however the record got there.
+</Warning>
+
+## rules — what an action will refuse
+
+Every rule carries the fact it asserts, so a caller can tell whether it will pass before it tries: a
+required field, a guard's condition, the states a transition may run from.
+
+## Nothing is published that the runtime does not do
+
+Every event kind listed is one the runtime actually emits. Every rule is one that actually refuses a
+write. A contract listing an event nobody emits is a promise that fails silently in somebody else's
+app, which is worse than no contract at all.

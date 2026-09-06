@@ -45,9 +45,11 @@
               "concepts",
               "concepts/semantic-source",
               "concepts/app-definition",
+              "concepts/app-contract",
               "concepts/schema",
               "concepts/targets",
-              "concepts/core-apps"
+              "concepts/core-apps",
+              "concepts/cross-app"
             ]
           },
           {
@@ -112,7 +114,7 @@
   },
   "integrations": {
     "ga4": {
-        "measurementId": "G-SCPVJ9QFG6"
+      "measurementId": "G-SCPVJ9QFG6"
     }
   },
   "navbar": {
@@ -133,7 +135,7 @@
       "github": "https://github.com/cordango"
     }
   },
-    "seo": {
+  "seo": {
     "metatags": {
       "canonical": "https://docs.cordango.com"
     }
