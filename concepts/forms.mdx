@@ -1,0 +1,177 @@
+---
+title: Forms
+description: "What a create dialog asks, and the forms people design inside an app."
+---
+
+import PlatformBeta from "/snippets/platform-beta-inline.mdx";
+
+
+Two things are called a form. The dialog that opens when somebody presses **New**, and a
+questionnaire that somebody designs inside a running app for other people to fill in. They are built
+from the same rule: **a person is only ever asked for what is theirs to say.**
+
+## What the create dialog asks
+
+A leave request has fourteen fields. The person asking for the time off fills in four of them. The
+rest are worked out, stamped, or decided by somebody else — and if the dialog asked for them anyway,
+it would be asking an employee who approves their own holiday.
+
+The compiler works out, per field, who fills it:
+
+| The field | What happens | Why |
+| --- | --- | --- |
+| `requested_by`, `owner`, `requester`, anything ending in `_by` | Filled with the signed-in person, never asked | It says who filed the record |
+| `submitted_at`, `opened_at`, `raised_at` | Stamped when the record is created | Same |
+| a `role: status` field | Starts at the lifecycle's first state | The process owns it |
+| a field with `initial` rules | Worked out from the new record at insert | The rule already knows the answer |
+| a field a command **collects** (`input`) or **writes** (`updateRecord`) | Left to the command | It is set when somebody approves, declines, assigns |
+| `approver`, `reviewer`, `decision`, `rejection_reason` | Hidden on create, editable later | Decided after the record exists |
+| anything `computed` | Never editable | The server derives it |
+
+Two of those have an exception that matters. A field the platform would hide is **asked for anyway
+when it is required and nothing else can fill it** — a nomination's `reviewer` is the whole record,
+and a New button that can only say "Reviewer is required" is not a feature. And a command that
+*writes* a field **beats a guess from its name**: `confirmed_by` looks like a stamp of whoever
+created the row, but if `Confirm` sets it to the actor, that is what it is.
+
+<Warning>
+`owner` means "whoever created the record" to the platform. A budget is handed to somebody, so its
+field is `holder`; a cost centre has a `head`. Name the field for what it is, and the dialog does
+the right thing.
+</Warning>
+
+### The one you are
+
+A person field the platform would fill in for you but still offers — the owner of anything that
+appears in a calendar, so HR can file leave on somebody else's behalf — opens **as you**. Change it
+when you are filing for somebody else, and leave it alone otherwise.
+
+### Authoring the form
+
+When the rules above are not enough, say what the dialog asks:
+
+```yaml views/entities/purchase_request/form.cordango.yaml
+form: purchase_request
+blocks:
+  - kind: section
+    label: What you need
+    blocks:
+      - kind: fields
+        fields: [title, category, amount]
+        columns: 2
+      - kind: fields
+        fields: [description, justification]
+  - kind: section
+    label: If you already know
+    blocks:
+      - kind: fields
+        fields: [vendor, budget_line]
+        columns: 2
+```
+
+An authored form is believed. A field it leaves out is not on the dialog, and a field it names is
+offered even when a command also collects it — a subscription's renewal date is typed when the
+contract is registered *and* set again by **Renew**, and both are right. What it cannot do is offer a
+system, computed or lifecycle field: those are nobody's to type.
+
+Fields the form leaves out are still reachable from the record. A detail section with `edit` opens
+the same dialog limited to that slice, which is how HR corrects an approver the employee never saw:
+
+```yaml
+- kind: section
+  label: Decision
+  edit: [approver, department]
+```
+
+`cordango check` reports an authored form that leaves out a required field nothing else can fill,
+and the app stays *incomplete* until the form offers it: a New button that cannot save is not a
+feature.
+
+## Forms people design
+
+<PlatformBeta />
+
+An intake form is a form whose **questions are records**. Somebody in the vendor team builds "Ask
+for a tool" for their department; anybody in the company fills it in; a vendor request appears in the
+team's queue. Nobody wrote a form in code, and the person filing it never needed the right to create a
+request.
+
+Four entities carry the archetype, named by `role`:
+
+| Role | Holds | Points at |
+| --- | --- | --- |
+| `formTemplate` | the form: a name, an intro, what it creates | — |
+| `formField` | one question: text, answer type, whether it must be answered | the template |
+| `formResponse` | one submission | the template |
+| `formAnswer` | one answer | the response and the question |
+
+A template says what a submission **files** with a `targetEntity` field, and both the template's own
+fields and each question can say which field of the filed record they land in with `mapsTo`:
+
+```yaml
+route_department:
+  type: reference
+  targetApp: platform
+  targetEntity: department
+  mapsTo: department          # every request from this form lands on this department
+```
+
+The compiler and the runtime split the work. The compiler checks the four roles hang together and
+that every `mapsTo` names a real field. The runtime stores the response and its answers, projects
+them into the target record, and links the record back to the submission — one server call, so a
+submitter needs only the right to **create a response**, and a failure halfway leaves nothing behind.
+
+### The front door
+
+```yaml views/screens/request_vendor.cordango.yaml
+screen: request_vendor
+label: Ask for a tool
+layout:
+  - kind: intake
+    entity: vendor_intake_form
+    filters:
+      - field: active
+        operator: eq
+        value: true
+```
+
+An `intake` block lists the forms and runs the one somebody picks. On the filed record, an `answers`
+block shows what they said, question by question:
+
+```yaml
+- kind: answers
+  label: What they told us
+```
+
+### Filling a form in about something
+
+A questionnaire is not always filing something new. A reviewer answering a 360 request, an inspector
+checking an asset, are filling a form **about a record that exists**. Put the intake block in that
+record's detail and name, with `via`, the submission's reference back to it:
+
+```yaml views/entities/feedback_request/detail.cordango.yaml
+- kind: intake
+  label: Answer the questionnaire
+  entity: feedback_form
+  via: request               # feedback_response.request → this feedback request
+  filters:
+    - field: kind
+      operator: eq
+      value: '{{record.kind}}'
+```
+
+The submission is written pointing at the record the block sits on. The template files nothing on
+its own — the answers *are* the point — and a rollup on the request counts them, so the reviewer
+sees where they are and HR sees who has not answered.
+
+## What is not built yet
+
+<Note>
+**Row-level permissions.** A grant says whether a role reads an entity, not which rows. An employee
+who may read feedback requests reads all of them; the answers and scores stay unreadable, which is
+where the anonymity actually lives. Per-row predicates are designed and not built.
+
+**Reading a core app's field.** A leave request cannot look up the person's manager in the personnel
+file, so the app keeps "who approves" on the allowance record HR maintains. A cross-app query is
+slice Q of the connected runtime plan.
+</Note>
