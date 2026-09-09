@@ -34,6 +34,9 @@ subdomain, or on a host you run yourself.
 | `POST` | `/data/{entity}` | Create a record. |
 | `PUT` | `/data/{entity}/{recordId}` | Replace a record. |
 | `DELETE` | `/data/{entity}/{recordId}` | Delete a record. |
+| `GET` | `/access` | Your own effective permissions per entity, and which commands you may run. |
+| `POST` | `/commands/{entity}/{command}/{recordId}` | Run one of the app's own actions. |
+| `GET` | `/connect` | Where this app can be reached, and the client snippets to reach it with. |
 
 The app has to have been built. These routes are driven by the manifest, so without one there's
 nothing to drive them.
@@ -41,7 +44,9 @@ nothing to drive them.
 <Tip>
 `GET /api/app/{handle}/openapi.json` is generated from your own app's manifest, so it lists your
 entities and your fields rather than a generic shape. Point a client generator at that rather than
-transcribing this page.
+transcribing this page. It is trimmed to **your** permissions and names the server it came from, so
+a generated client is pointed at the right origin and cannot be built around a field you may not
+read.
 </Tip>
 
 ## Errors

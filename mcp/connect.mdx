@@ -1,0 +1,48 @@
+---
+title: The Connect page
+description: "Where every app says what it can do and how to reach it."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+Every app carries a **Connect** link in its header, beside "Make my own copy". It opens one page that
+answers the two questions a person has when they want to use an app from anywhere other than the
+browser: what can this app do, and what do I paste where.
+
+## What it shows
+
+**What you can do here.** Every entity you can read, and which of read, add, change and remove your
+role allows on each, plus the app's own actions you may run. This is *your* access, not the app's
+full shape — somebody with a different role sees a different table, which is the point.
+
+**REST.** The base address, a `curl` line that works as written against an entity you can actually
+read, and a link to the app's own OpenAPI document.
+
+**MCP.** Both endpoints, a ready-made `claude mcp add` command, and the same thing as a JSON config
+block for a client that takes one. Nothing on the page carries a real key: every snippet has a
+placeholder, and the button beside them goes to the one place a credential is ever shown.
+
+**In your browser.** Whether [WebMCP](/mcp/webmcp) is available here, and which tools this app hands
+the browser's assistant when it is.
+
+## Two addresses, on purpose
+
+REST and MCP are quoted on different origins, and the page says so when they differ.
+
+| | Answers on |
+| --- | --- |
+| REST, OpenAPI, the contract | the API origin, for example `https://api.cordango.com` |
+| MCP, the server card | your workspace's own hostname, for example `https://acme.cordango.com` |
+
+A workspace hostname serves the application and the public pages; it does not proxy the data API. So
+a snippet that quoted the wrong one would fail by returning a page of HTML, which is the hardest kind
+of failure to read. Every address on the Connect page is built by the server for exactly this reason,
+and it is the same text the CLI and this documentation use.
+
+## Why it exists
+
+Every app has had a REST facade and an OpenAPI document for months. Nothing in the product ever said
+so, and the only way to find the address was to read the source. A capability nobody can find is a
+capability nobody has.

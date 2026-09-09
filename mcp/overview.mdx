@@ -35,14 +35,23 @@ A Cordango workspace serves MCP at two levels. Same tools, same auth, different 
 | One app | `https://acme.cordango.com/mcp/app/support` | That app only |
 
 Point a general assistant at the workspace endpoint. Point a narrow agent, the one that files
-tickets and does nothing else, at the app endpoint, because an agent that can't see billing can't
-be talked into touching it.
+tickets and does nothing else, at the app endpoint.
+
+<Warning>
+The app endpoint narrows what a **client sees**, not what a **key may do**. A personal access key
+acts as the person who made it, everywhere they can reach, so a client pointed at one app can still
+call the workspace endpoint with the same key. It's worth having, because an agent that can't see
+billing can't be talked into touching billing, but it isn't a boundary until keys can be scoped to
+an app.
+</Warning>
+
+The exact addresses for any app are on that app's **Connect** page in the product, which also carries
+a ready-made client configuration.
 
 ## The tools
 
-Twelve at the workspace endpoint, whatever the workspace contains. The app endpoint serves nine of
-them, dropping `list_apps`, `describe_workspace` and `find_related` along with the `app` parameter,
-because there's no second app for them to mean anything about.
+Nine, whatever the workspace contains. The app endpoint serves eight of them, dropping `list_apps`
+along with the `app` parameter, because there's no second app for it to mean anything about.
 
 | Tool | What it does |
 | --- | --- |
@@ -55,9 +64,6 @@ because there's no second app for them to mean anything about.
 | `delete_record` | Remove one |
 | `run_command` | Run one of the app's own actions (approve, close, assign) |
 | `aggregate_records` | Count or total, computed by the database |
-| `find_related` | Everything across every app that points at one record |
-| `search` | Text search across the apps you can reach |
-| `describe_workspace` | The apps, the core apps, and how they reference each other |
 
 Deliberately not one tool set per entity, and not one per app. A client pays for the tool list on
 every request, so a workspace with six apps and twenty entities each would otherwise publish several
@@ -65,48 +71,33 @@ hundred tools and charge for that list every time. This way the cost stays const
 big the workspace gets, and `describe_app` is how a client learns the shape of one app when it needs
 to.
 
-The `app` and `entity` parameters carry an `enum` of the real handles and keys you can reach, so a
-client can make its first useful call without a round trip.
+**Every tool projects an operation the REST facade already has.** That is the whole reason MCP is on
+by default rather than being an integration with a permission model of its own, and it is why there
+is no tool here that REST cannot do. Cross-app search, and "everything that points at this record",
+arrive when the queries behind them do.
+
+On the app endpoint, `entity` carries an `enum` of that app's real keys, so a client's first call can
+be right without a round trip. The workspace endpoint has no such list: the tool list is identical for
+every caller, and one that varied by role could not be cached and would say what your role is. Call
+`list_apps` first instead, and if you guess a name wrong, the refusal names the ones that exist.
 
 ## Cross-app questions
 
-This is the part a per-app integration can't do, and the reason the workspace endpoint exists.
-
 Every app in a workspace shares one data model. A customer is a record in
-[core Organizations](/concepts/core-apps), and the support app, the billing app and the sales app
-all reference that same record rather than keeping three copies of a company with three addresses.
-So a question that spans them is a lookup, not an integration project.
-
-```json
-{
-  "name": "find_related",
-  "arguments": {
-    "app": "core_organizations",
-    "entity": "organization",
-    "recordId": "0d0c…",
-    "in": ["support", "billing", "sales"]
-  }
-}
-```
-
-That comes back with the open tickets, the unpaid invoices and the deal in progress, each labelled
-with the app it came from. Leave `in` out and it searches every app you can reach.
-
-An assistant asked "what is going on with Contoso" makes two calls. `search` to find the
-organization, then `find_related` to collect everything hanging off it. Nothing had to be joined
-ahead of time.
+[core Organizations](/concepts/core-apps), and the support app, the billing app and the sales app all
+reference that same record rather than keeping three copies of a company with three addresses. So a
+question that spans them is a lookup rather than an integration project.
 
 <Note>
-`aggregate_records` runs inside one app, because the aggregate is computed by the database and the
-answer has to be exact. It can still **group by** a cross-app reference, so "open tickets by
-customer industry" works even though industry lives in core Organizations and tickets live in
-support.
+Today an assistant does this the direct way: `list_apps`, then `describe_app` on the ones that
+matter, then `list_records` in each. Dedicated `search` and `find_related` tools are planned and
+arrive with the cross-app queries behind them. We would rather not publish a tool that answers
+"not yet".
 </Note>
 
-Two things `find_related` deliberately does not do. It doesn't follow a chain further than one hop,
-because a client asking for everything two hops from a company gets the whole workspace back. And it
-doesn't cross a permission boundary to tell you a record exists: an app you have no relationship
-with is absent from the answer, exactly as it would be from `list_apps`.
+`aggregate_records` runs inside one app, because the aggregate is computed by the database and the
+answer has to be exact. It can still **group by** a cross-app reference, so "open tickets by customer
+industry" works even though industry lives in core Organizations and tickets live in support.
 
 ## Permissions
 
@@ -115,10 +106,15 @@ gateway the controllers do, so:
 
 - The app's roles decide each call.
 - Fields your role may not read are absent from the answer rather than null.
-- A refusal carries the same stable code the REST route returns, for example
-  `record.create_denied`.
+- A refusal carries the same stable code the REST route returns, for example `common.forbidden`,
+  `app.fields_not_writable` or `command.wrong_state`, with the sentence beside it. Fixtures run the
+  same operation over both surfaces and compare the codes, so this stays true rather than being
+  asserted once.
 - An app you have no relationship with answers as a missing app does, because whether an app exists
   isn't something an unrelated caller gets to learn.
+- Permissions are per **entity**. A role that may read an entity reads every row of it: there is no
+  row-level predicate outside the calendar yet, and MCP inherits that exactly, no better and no
+  worse.
 
 `describe_app` and `list_apps` both report your own permissions, so a client can plan instead of
 discovering its limits by being refused halfway through a task.
@@ -165,7 +161,7 @@ depends on finding it there.
 
 An application generated by `cordango build` serves its own MCP endpoint, on by default. One app,
 one process, nothing above it, so the tool list is eight: `describe_app` and the seven record tools.
-No `list_apps`, no `find_related`, no workspace search, because there's nothing to cross to.
+No `list_apps`, because there's no second app to choose between.
 
 | | |
 |---|---|

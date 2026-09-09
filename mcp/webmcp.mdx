@@ -1,0 +1,63 @@
+---
+title: WebMCP
+description: "The assistant in your browser, using the app as you."
+---
+
+import PlatformBeta from "/snippets/platform-beta.mdx";
+
+<PlatformBeta />
+
+MCP is for a client somewhere else, holding a key. **WebMCP** is for the assistant built into the
+browser you are already signed in to. Cordango registers tools on each app's pages, and an agent in
+that browser can call them.
+
+<Note>
+WebMCP is a proposal at the W3C Web Machine Learning Community Group, in an origin trial in Chrome
+and Edge. Whether it is available is your browser's decision, not ours. Each app's
+[Connect page](/mcp/connect) says plainly whether this browser can use it.
+</Note>
+
+## What makes it different
+
+There is **no endpoint and no credential**. The tools run inside the tab, through the same session
+you already have, so an assistant reaches exactly what you could reach by clicking and nothing at
+all when you sign out. Nothing you do this way leaves the browser except the ordinary API calls the
+app was going to make anyway.
+
+That is why it is on by default and why the tool set is not the same as the MCP one.
+
+## The tools
+
+| Tool | What it does |
+| --- | --- |
+| `describe_app` | The open app: its entities, their fields, and what you may do with each |
+| `list_records` | A page of records, with filters and sorting |
+| `get_record` | One record by id |
+| `aggregate_records` | Count or total, computed by the server |
+| `create_record` | Add one |
+| `update_record` | Change the fields it names |
+| `run_command` | Run one of the app's own actions |
+| `open_page` | Show one of the app's pages |
+| `open_record` | Show one record |
+
+The last two are the ones a browser can do and a server cannot. An assistant that can answer "where
+do I see this" by putting it on screen is worth more here than another way to read rows.
+
+**There is no `delete_record`.** Deleting is irreversible and a misread sentence is a poor reason to
+lose a record, so the browser tools navigate you to the record instead and let you decide.
+
+## What asks before it acts
+
+Every write is marked *consequential*, which is the browser's cue to confirm with you before running
+it. Every tool that returns record data is marked as carrying content the app's own users wrote, so
+an agent treats it as data rather than as instructions.
+
+Results are kept small on purpose — ten records by default, twenty-five at most. An answer much over
+a page tends to be dropped by the agent rather than truncated, and a dropped answer looks like a tool
+that does not work.
+
+## Turning it off
+
+It is a workspace setting, like MCP: an administrator can switch `webmcp` off and the app stops
+registering anything. A browser that does not support WebMCP registers nothing either way, and the
+application behaves exactly as it always has.
