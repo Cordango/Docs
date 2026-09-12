@@ -1,0 +1,185 @@
+---
+title: Custom code
+description: "When a definition cannot say it, write it."
+---
+
+Most of an application is better described than coded, which is what the definition is for. A few
+things are not. Rounding rules. A checksum. A rule that holds across two fields rather than in one.
+A side effect on write that belongs to your business and nobody else's.
+
+Put the code in `custom/dotnet/` beside the rest of the app and call it by name.
+
+<Note>
+  Available for the `dotnet-vue` target. Custom TypeScript for `node-vue` is not built yet, and an
+  application carrying custom code cannot run on the Cordango platform. See
+  [Where it runs](#where-it-runs).
+</Note>
+
+## Set it up
+
+```bash
+cordango custom
+```
+
+That writes the folder, a sample, and a project file your editor reads so `Invoice` and
+`RecordContext` resolve while you type.
+
+```
+apps/support/
+  custom/
+    dotnet/
+      Support.Custom.csproj   for your editor. Nothing builds it.
+      Rules.cs                your code
+      .generated/             record types, written by cordango build. Not committed.
+```
+
+The `.csproj` exists so an editor has something to load. The generated application compiles its own
+copy of these files, so nothing here is what ships.
+
+On a fresh clone `.generated/` is not there yet and your editor will show errors until you run
+`cordango build` once.
+
+## Functions
+
+A function is callable from any computed field.
+
+```csharp
+namespace Support.Custom;
+
+[CordangoFunctions]
+public static class Rounding
+{
+    [CordangoFunction("round", Description = "Nearest whole number, halves away from zero.")]
+    public static decimal? Round(decimal? value) =>
+        value is null ? null : decimal.Round(value.Value, 0, MidpointRounding.AwayFromZero);
+}
+```
+
+```yaml
+active_customers:
+  label: Active customers
+  type: integer
+  computed:
+    expr: custom.round(active_exact)
+```
+
+The name in the attribute is the name the expression uses. It is deliberately separate from the C#
+method name, so renaming a method does not rewrite every formula that calls it.
+
+### The rules
+
+A function must answer immediately and answer the same thing every time. A computed field is worked
+out when the row is written and stored beside it, and the recompute cascade may work it out many
+times over, so one that reads a clock or a random number is right once and wrong afterwards.
+
+`cordango check` refuses a function that is `async`, or that reads `DateTime.UtcNow`,
+`Guid.NewGuid`, `Random` or anything else whose answer moves. It warns about `HttpClient`, `File`
+and friends. It cannot see through a helper you call, so this is a promise you keep rather than one
+the compiler keeps for you.
+
+Parameters and returns are `decimal?`, `bool?` or `string?`, and nothing else:
+
+| C# | In a formula |
+| --- | --- |
+| `decimal?` | number |
+| `bool?` | boolean |
+| `string?` | text |
+
+Every one is nullable because a computed value can be unknown, and a non-nullable parameter has
+nowhere to put that. Numbers are `decimal` throughout, since an average of integers is not an
+integer. Dates are not offered yet.
+
+## Hooks
+
+A hook runs around a write. It has none of the restrictions above: it may be async and may do I/O.
+
+```csharp
+[CordangoHooks]
+public sealed class PlanWindow
+{
+    [BeforeCreate]
+    public Task OnCreate(Scenario record, RecordContext ctx, CancellationToken ct)
+    {
+        Check(record);
+        return Task.CompletedTask;
+    }
+
+    [BeforeUpdate]
+    public Task OnUpdate(Scenario record, Scenario before, RecordContext ctx, CancellationToken ct)
+    {
+        Check(record);
+        return Task.CompletedTask;
+    }
+}
+```
+
+The class is resolved from the container, so it can take a logger or a `DbContext` through its
+constructor like any other service.
+
+Each attribute has one signature. Update hooks are handed both the incoming record and the row as it
+was, which is what makes "did this field actually change" answerable:
+
+| Attribute | Signature |
+| --- | --- |
+| `[BeforeCreate]` `[AfterCreate]` | `Task M(T record, RecordContext ctx, CancellationToken ct)` |
+| `[BeforeUpdate]` `[AfterUpdate]` | `Task M(T record, T before, RecordContext ctx, CancellationToken ct)` |
+| `[BeforeDelete]` `[AfterDelete]` | `Task M(T record, RecordContext ctx, CancellationToken ct)` |
+
+### Refusing a write
+
+Throw `RecordException` from a before-hook and the write stops with a message the caller sees. This
+is the thing a definition cannot do: it describes fields, not the arithmetic that has to hold
+between them.
+
+```csharp
+throw new RecordException(
+    "scenario.monthly_window",
+    $"The plan runs {years} years, which is {available} months, and this asks for {months} months "
+    + "of monthly detail. Shorten the monthly window, or lengthen the plan.",
+    fields: ["monthly_months"]);
+```
+
+An after-hook runs once the write is already decided and cannot veto it.
+
+### Ordering
+
+A before-hook runs before the computed fields, so it can set a value the formulas then read. If you
+want the opposite, say so:
+
+```csharp
+[BeforeUpdate(Stage = HookStage.AfterComputed)]
+```
+
+```
+AutoFields  →  before-hooks  →  computed fields  →  after-hooks  →  SAVE
+```
+
+Two hooks on the same entity run in the order they appear in the file.
+
+## What happens at build
+
+`cordango build` reads the folder, works out what it declares, and records the contract in the App
+Definition along with a hash of the sources. The bodies are never part of the definition. The
+generator checks the hash before it writes anything, so an application can never carry code its own
+definition does not vouch for.
+
+The sources are copied into the generated application under `api/Custom/` and compiled with it. A
+wrong signature is a build error in your own project, with a file and a line.
+
+`cordango doctor` tells you when the code has changed since the last build.
+
+## Where it runs
+
+| | Custom code |
+| --- | --- |
+| `dotnet-vue` | Yes |
+| `node-vue` | Not yet. Reported as `CORD23xx` |
+| Cordango platform | No |
+
+The platform runs an application by interpreting its definition. There is no compiler in the runtime
+and no sandbox, so a method you wrote has nothing there to execute it. `cordango check --target
+platform` and `cordango publish` both refuse rather than accepting an application whose figures
+would silently come out blank.
+
+If you need an app on the platform, express the calculation with what the language already has.
+[Computed fields](/concepts/app-definition) covers what that is.

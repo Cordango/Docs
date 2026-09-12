@@ -60,6 +60,7 @@
               "guides/authoring",
               "guides/semantic-ops",
               "guides/roles",
+              "guides/custom-code",
               "guides/validation",
               "guides/deploying"
             ]

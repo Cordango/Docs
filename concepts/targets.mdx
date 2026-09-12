@@ -107,4 +107,10 @@ authentication and permissions. Not multi-tenant, no AI at runtime.
 Cordango Platform runs **many** applications as one company system: shared people and organizations
 across apps, cross-app references, audit history, governance, AI, search and managed hosting.
 
+There is one thing the standalone target does that the platform cannot. A generated application is
+compiled, so it can carry [custom code](/guides/custom-code) of your own: a function a formula
+calls, or a hook that runs on write. The platform interprets a definition and has no compiler, so an
+application carrying custom code is refused rather than published with the figures it cannot work
+out left blank.
+
 Neither one drops something it can't do without telling you.
