@@ -50,7 +50,7 @@ a ready-made client configuration.
 
 ## The tools
 
-Nine, whatever the workspace contains. The app endpoint serves eight of them, dropping `list_apps`
+Ten, whatever the workspace contains. The app endpoint serves nine of them, dropping `list_apps`
 along with the `app` parameter, because there's no second app for it to mean anything about.
 
 | Tool | What it does |
@@ -58,6 +58,7 @@ along with the `app` parameter, because there's no second app for it to mean any
 | `list_apps` | Every app you can reach, its handle, what it's for, and what you may do in it |
 | `describe_app` | One app: its entities, their fields as JSON Schema, its commands, and your own permissions on each |
 | `list_records` | A page of records, with filters and sorting |
+| `find_records` | The records that answer a precise question: every filter operator, several sort keys, and `{{actor.id}}` or `{{today}}` for "mine" and "recent" |
 | `get_record` | One record by id |
 | `create_record` | Add one |
 | `update_record` | Change the fields you name, leaving the rest alone |
